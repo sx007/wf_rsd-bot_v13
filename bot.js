@@ -20,7 +20,7 @@ const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 const startBot = Date.now();
 
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],partials: ['USER','MESSAGE', 'CHANNEL', 'REACTION'] });
 /* Вывод сообщения о работе и готовности бота */
 client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
@@ -78,8 +78,9 @@ client.on('messageCreate', message => {
     const command = args.shift().toLowerCase();
     //Если команда Ping
     if (command === "ping") {
-        message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong`)]});
-        /*
+        //console.log("+");
+        //message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong`)]});
+
         //Если сообщение публичное
         if (privateMsg() == false){
             //message.reply({ content: 'Pong', allowedMentions: { repliedUser: false }});
@@ -87,7 +88,7 @@ client.on('messageCreate', message => {
         } else {
             message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong (Privat)`)]});
         }
-        */
+
         
     }
 });
