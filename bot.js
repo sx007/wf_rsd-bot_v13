@@ -20,11 +20,11 @@ const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 const startBot = Date.now();
 
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],partials: ['USER','MESSAGE', 'CHANNEL', 'REACTION'] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 /* Вывод сообщения о работе и готовности бота */
 client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
-    client.user.setPresence({ activities: [{ name: '⚠ В разработке ⚠' }], status: 'online' });
+    client.user.setPresence({ activities: [{ name: '⚠ В разработке ⚠' }], status: 'dnd' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
 });
 
@@ -92,6 +92,49 @@ client.on('messageCreate', message => {
         });
         //Выводим результат
         return result;
+    }
+
+    //Проверка на JSON
+    function IsJsonString(str) {
+        str = typeof item !== "string"
+            ? JSON.stringify(str)
+            : str;
+        try {
+            str = JSON.parse(str);
+        } catch (e) {
+            return false;
+        }
+        if (typeof str === "object" && str !== null) {
+            return true;
+        }
+        return false;
+    }
+
+    //Номер сервера в название
+    function numSrvToStr(num){
+        if (num == 1){
+            return "Альфа";
+        }
+        if (num == 2){
+            return "Браво";
+        }
+        if (num == 3){
+            return "Чарли";
+        }
+    }
+
+    //Удаление из текстого канала ссылок-приглашений
+    if (message.content.includes('discord.gg/') ||  message.content.includes('discordapp.com/invite/')){
+        //Если сообщение публичное
+        if (privateMsg() == false){
+            //Если сообщение от Администратора или Модератора, то разрешаем
+            if(!hasRoleId(message.member)){
+                //Удаляем сообщение
+                message.delete();
+                //Отправляем в личку сообщение пользователю
+                message.author.send({ content: 'Ссылки-приглашения (Invite) **запрещены** на данном сервере!\nЧтобы кого-то пригласить на другой Discord-сервер, отправьте приглашение или ссылку в личку определённому человеку.', allowedMentions: { repliedUser: false }});
+            }
+        }
     }
 
     //Проверка на наличие префикса в начале сообщения
