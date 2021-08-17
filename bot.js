@@ -68,6 +68,32 @@ client.on('messageCreate', message => {
         }
     }
 
+    //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
+    function hasRoleId(mem){
+        var idRepl = idAdmMod.replace(/ +/g, ' ');
+        var idSplit = idRepl.split(' ');
+        var result = false;
+        //Перебираем ID в переменной
+        idSplit.forEach(function(idSplit) {
+            if (idSplit != '') {
+                //Проверяем длинну ID
+                if (idSplit.length === 18) {
+                    //Проверка указанного id сервера
+                    if (idSrv !== '' || idSrv.length === 18) {
+                        //Проверка роли
+                        var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
+                        //Находим среди пользователей с ролью автора сообщения
+                        if (members.indexOf(mem.id) != -1) {
+                            result = true;
+                        }
+                    }
+                }
+            }
+        });
+        //Выводим результат
+        return result;
+    }
+
     //Проверка на наличие префикса в начале сообщения
     if (!message.content.startsWith(prefix)) return;
     //Получение команды из полученного сообщения
@@ -78,8 +104,16 @@ client.on('messageCreate', message => {
     const command = args.shift().toLowerCase();
     //Если команда Ping
     if (command === "ping") {
-        //console.log("+");
         //message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong`)]});
+        //console.log(message.author);
+
+        //Если сообщение от Администратора или Модератора, то разрешаем
+
+        if(hasRoleId(message.author)){
+            message.reply({ content: 'Есть права', allowedMentions: { repliedUser: false }});
+        } else {
+            message.reply({ content: 'Нет прав', allowedMentions: { repliedUser: false }});
+        }
 
         //Если сообщение публичное
         if (privateMsg() == false){
@@ -88,8 +122,6 @@ client.on('messageCreate', message => {
         } else {
             message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong (Privat)`)]});
         }
-
-        
     }
 });
 
