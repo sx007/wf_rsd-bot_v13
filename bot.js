@@ -188,25 +188,22 @@ client.on('messageCreate', message => {
         }
     }
 
-    //Если команда Ping
-    else if (command === "ping") {
-        //message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong`)]});
-        //console.log(message.author);
-
-        //Если сообщение от Администратора или Модератора, то разрешаем
-
-        if(hasRoleId(message.author)){
-            message.reply({ content: 'Есть права', allowedMentions: { repliedUser: false }});
-        } else {
-            message.reply({ content: 'Нет прав', allowedMentions: { repliedUser: false }});
+    //Если отправлена команда вк
+    else if (command === "вк") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nДанная команда позволяет получить ссылку на группу нашего клана в социальной сети ВКонтакте.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/LtMTPRC.gif')]});
+            return;
         }
-
-        //Если сообщение публичное
-        if (privateMsg() == false){
-            //message.reply({ content: 'Pong', allowedMentions: { repliedUser: false }});
-            message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong (Pub)`)]});
-        } else {
-            message.reply({ embeds: [EmbMsg(':information_source: ОТВЕТ',0x7ED321,`\nPong (Privat)`)]});
+        if(numArg === 1) {
+            //Отправляем ссылку на группу
+            message.reply({ embeds: [EmbMsg(':thumbsup: Группа клана', 0x2B71FF, `\nВступайте в нашу группу в социальной сети ВКонтакте:\n[Наша группа в ВК](https://vk.com/wf_rsd)`)]});
+            return;
+        }
+        if(numArg > 2) {
+            //Выдаём ошибку
+            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0x2B71FF, `\nДопущена ошибка при вводе команды.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``)]});
+            return;
         }
     }
 });
