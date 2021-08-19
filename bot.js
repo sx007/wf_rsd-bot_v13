@@ -1,4 +1,4 @@
-const { Client, Intents, MessageEmbed } = require('discord.js');
+const { Client, Intents, MessageEmbed, Permissions,  } = require('discord.js');
 var request = require('request');
 var express = require('express');
 
@@ -23,7 +23,8 @@ const startBot = Date.now();
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 
 //Получаем ID владельца сервера
-const ownerSrvID = client.guilds.cache.map(guild => guild.ownerID).join("\n");
+const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
+
 
 /* Вывод сообщения о работе и готовности бота */
 client.on('ready', () => {
@@ -59,6 +60,10 @@ function EmbMsgHelp(title, color, descr, img){
 client.on('messageCreate', message => {
     //Если это сам же бот, то игнорировать
     if (message.author.bot) return;
+
+    //Получаем ID владельца сервера
+    const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
+    //console.log(ownerSrvID);
 
     //Проверка на личное сообщение
     function privateMsg(){
@@ -132,7 +137,7 @@ client.on('messageCreate', message => {
         //Если сообщение публичное
         if (privateMsg() == false){
             //Если сообщение от Администратора или Модератора, то разрешаем
-            if(!hasRoleId(message.member)){
+            if(!hasRoleId(message.author)){
                 //Удаляем сообщение
                 message.delete();
                 //Отправляем в личку сообщение пользователю
@@ -206,6 +211,94 @@ client.on('messageCreate', message => {
             return;
         }
     }
+
+    //Если отправлена команда ping
+    else if (command === "ping") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nДанная команда позволяет узнать время генерации сообщения.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/DdqIw0Z.gif')]});
+            return;
+        }
+        const timeTaken = Date.now() - message.createdTimestamp;
+        //Если сообщение публичное
+        if (privateMsg() == false){
+            //Если публичное сообщение
+            if (hasRoleId(message.author)){
+                //И есть права необходимые
+                message.reply({ content: `Время генерации сообщения ${timeTaken}ms.`, allowedMentions: { repliedUser: false }});
+                //message.reply(`Время генерации сообщения ${timeTaken}ms.`);
+            } else {
+                //Если нет таких прав
+                message.reply({ content: `У тебя нет прав для данной команды`, allowedMentions: { repliedUser: false }});
+                //message.reply(`У тебя нет прав для данной команды`);
+            }
+        } else {
+            //Если личное сообщение
+            if (hasRoleId(message.author)){
+                //И есть права необходимые
+                message.reply({ content: `Время генерации сообщения ${timeTaken}ms.`, allowedMentions: { repliedUser: false }});
+                //message.reply(`Время генерации сообщения ${timeTaken}ms.`);
+            } else {
+                //Если нет таких прав
+                message.reply({ content: `У тебя нет прав для данной команды`, allowedMentions: { repliedUser: false }});
+                //message.reply(`У тебя нет прав для данной команды`);
+            }
+        }
+    }
+
+    /* Команда перезагрузки бота */
+    else if (command === "rs") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nДанная команда позволяет перезагрузить бота дистанционно.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/iHZWyZA.gif')]});
+            return;
+        }
+        //Если сообщение публичное
+        if (privateMsg() == false){
+            console.log(message.author.id, " ", ownerSrvID);
+            //Проверяем автора - владелец ли сервера
+            if (message.author.id === ownerSrvID) {
+                //Если владелец, то перезапускаем бота
+                //message.reply(`:robot: :repeat: **Бот перезапускается!**`).then(m => m.delete({timeout: 15000}));
+                console.log("Restart bot ...");
+                process.exit(1);
+            } else {
+                //Если нет прав
+                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }});
+                //setTimeout(() => message.delete(), 20000);
+                //message.reply(`:no_entry: **У вас нет прав для данной команды!**`).then(m => m.delete({timeout: 20000}));
+            }
+        } else {
+            //Если личное сообщение
+            //Проверяем автора - владелец ли сервера
+            if (message.author.id === ownerSrvID) {
+                //Если владелец, то перезапускаем бота
+                //message.reply(`:robot: :repeat: **Бот перезапускается!**`);
+                console.log("Restart bot ...");
+                process.exit(1);
+            } else {
+                //Если нет прав
+                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }});
+                //message.reply(`:no_entry: **У вас нет прав для данной команды!**`);
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 });
 
 
