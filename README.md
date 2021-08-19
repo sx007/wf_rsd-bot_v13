@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://i.imgur.com/2X50Lhx.jpg" alt="Logo Clan + Discord" />
+</p>
+
 Проект в стадии разработки.
 ======
 | Информация | Описание |
