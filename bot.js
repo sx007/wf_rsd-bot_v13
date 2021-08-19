@@ -1377,6 +1377,156 @@ client.on('messageCreate', message => {
         }
     }
 
+    /* Команда гороскоп */
+    else if (command === "гороскоп") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить гороскоп на сегодня по указанному знаку зодиака.\n\nЧтобы получить прогноз, достаточно набрать команду **${prefix}${command}**\n\nДалее дождаться появления 12ти реакций к сообщению. Нажать на соответствующий знак-реакцию. После чего в текущем сообщении появится прогноз.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/pgOEsWn.gif')]});
+            return;
+        }
+        //Фильтр для реакций
+        const filter = (reaction, user) => {
+            return ['♈', '♉', '♊', '♋', '♌', '♍', '♎', '♏', '♐', '♑', '♒', '♓'].includes(reaction.emoji.name) && user.id === message.author.id;
+        };
+        //Отправляем сообщение для выбора зодиака
+        message.reply({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Укажите знак задиака, нажав на соответсвующую реакцию под данным сообщением.\n\n♈ - Овен\n♉ - Телец\n♊ - Близнецы\n♋ - Рак\n♌ - Лев\n♍ - Дева\n♎ - Весы\n♏ - Скорпион\n♐ - Стрелец\n♑ - Козерог\n♒ - Водолей\n♓ - Рыбы\n\nДождитесь появления всех 12 реакций\n\n`)]})
+        .then(msg => {
+            //Выставляем реакции к сообщению
+            msg.react('♈')
+            msg.react('♉')
+            msg.react('♊')
+            msg.react('♋')
+            msg.react('♌')
+            msg.react('♍')
+            msg.react('♎')
+            msg.react('♏')
+            msg.react('♐')
+            msg.react('♑')
+            msg.react('♒')
+            msg.react('♓')
+            //Ожидание реакции от пользователя
+            msg.awaitReactions({ filter, max: 1, time: 60000, errors: ['time'] })
+            .then((collected) => {
+                const reaction = collected.first();
+                //Название знака
+                var znak = "", nameznak = "";
+                //Проверяем что было выбрано
+                if (reaction.emoji.name === '♈') {
+                    znak = "aries";
+                    nameznak = "Овен";
+                }
+                if (reaction.emoji.name === '♉') {
+                    znak = "taurus";
+                    nameznak = "Телец";
+                }
+                if (reaction.emoji.name === '♊') {
+                    znak = "gemini";
+                    nameznak = "Близнецы";
+                }
+                if (reaction.emoji.name === '♋') {
+                    znak = "cancer";
+                    nameznak = "Рак";
+                }
+                if (reaction.emoji.name === '♌') {
+                    znak = "leo";
+                    nameznak = "Лев";
+                }
+                if (reaction.emoji.name === '♍') {
+                    znak = "virgo";
+                    nameznak = "Дева";
+                }
+                if (reaction.emoji.name === '♎') {
+                    znak = "libra";
+                    nameznak = "Весы";
+                }
+                if (reaction.emoji.name === '♏') {
+                    znak = "scorpio";
+                    nameznak = "Скорпион";
+                }
+                if (reaction.emoji.name === '♐') {
+                    znak = "sagittarius";
+                    nameznak = "Стрелец";
+                }
+                if (reaction.emoji.name === '♑') {
+                    znak = "capricorn";
+                    nameznak = "Козерог";
+                }
+                if (reaction.emoji.name === '♒') {
+                    znak = "aquarius";
+                    nameznak = "Водолей";
+                }
+                if (reaction.emoji.name === '♓') {
+                    znak = "pisces";
+                    nameznak = "Рыбы";
+                }
+
+                //Удаляем реакции после выбора из текстового канала
+                if (privateMsg() == false){
+                    msg.reactions.removeAll().catch(error => console.error('Ошибка при очистке реакций: ', error));
+                }
+                
+                //Получаем сам гороскоп
+                var horo = "";
+                let link = "https://horoscopes.rambler.ru/api/front/v1/horoscope/today/" + znak;
+                let urlEnc = encodeURI(link);
+                var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+                //Запрос
+                request(options, function(error, response, body){
+                    //Если возникла ошибка
+                    if (error) {
+                        console.log(error);
+                        //Изменяем Embed сообщение
+                        horo = { embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`).then(m => setTimeout(() => m.delete(), 10000))]};
+                        msg.edit(horo);
+                        return;
+                    } else {
+                        //Если есть ответ
+                        if (response) {
+                            //Если статус запроса 200
+                            if (response.statusCode == 200) {
+                                if (IsJsonString(body) == true) {
+                                    var regex = /(<([^>]+)>)/ig;
+                                    var bodytext = body.text;
+                                    var texthoro = bodytext.replace(regex, "");
+                                    //Изменяем Embed сообщение
+                                    horo = { embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`)]};
+                                    msg.edit(horo);
+                                    return;
+                                } else {
+                                    //Ошибка - не JSON
+                                    horo = { embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла ошибка в данных.\nПопробуйте отправить команду позже.`).then(m => setTimeout(() => m.delete(), 10000))]};
+                                    msg.edit(horo);
+                                    return;
+                                }
+                            } else {
+                                //Неверный запрос || Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
+                                if (response.statusCode == 400 || response.statusCode == 403 || response.statusCode == 404 || response.statusCode == 500) {
+                                    horo = { embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`).then(m => setTimeout(() => m.delete(), 10000))]};
+                                    msg.edit(horo);
+                                    return;
+                                }
+                            }
+                        } else {
+                            //Нет данных ответа сервера
+                            horo = { embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`).then(m => setTimeout(() => m.delete(), 10000))]};
+                            msg.edit(horo);
+                            return;
+                        }
+                    }
+                });
+            })
+            .catch((collected) => {
+                var infonoch = { embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Вы не выбрали знак зодиака.\nСообщение будет удалено автоматически.\n`)]};
+                //Удаляем реакции после выбора из текстового канала
+                if (privateMsg() == false){
+                    msg.reactions.removeAll().catch(error => console.error('Ошибка при очистке реакций: ', error));
+                }
+                //Изменяем сообщение и удаляем
+                msg.edit(infonoch).then(m => setTimeout(() => m.delete(), 10000));
+            })
+        });
+    }
+
 
 
 
