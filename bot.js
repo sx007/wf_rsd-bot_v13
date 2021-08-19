@@ -63,6 +63,8 @@ client.on('messageCreate', message => {
 
     //Получаем ID владельца сервера
     const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
+    //Название сервера
+    const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
 
     //Проверка на личное сообщение
     function privateMsg(){
@@ -411,7 +413,7 @@ client.on('messageCreate', message => {
             return;
         }
         //Название сервера
-        const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
+        //const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
         //Проверяем куда была отправленна данная команда
         if (privateMsg() == false){
             //публично
@@ -467,6 +469,74 @@ client.on('messageCreate', message => {
             } else {
                 //Если нет таких прав
                 message.reply({ content: `\n:no_entry_sign: Недостаточно прав для данной команды!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
+            }
+        } else {
+            //лично
+            message.reply({ content: `:no_entry_sign: Данная команда здесь недоступна!`, allowedMentions: { repliedUser: false }});
+        }
+    }
+
+    /* Забанить пользователя на сервере */
+    else if (command === "бан") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет забанить пользователя на сервере.\n\nУказываем пользователя через знак @\nЧерез пробел можно указать причину бана.\n\n**Пример набора команды**\n\`\`\`${prefix}${command} @пользователь Причина\`\`\``, 'https://i.imgur.com/EvOKwro.gif')]});
+            return;
+        }
+        //Проверяем куда была отправленна данная команда
+        if (privateMsg() == false){
+            //публично
+            let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+            let reas = args.slice(1).join(' ');
+            //Если автор сообщения - Бот
+            if (message.author.bot){
+                return;
+            };
+            //Проверяем права на доступ к данной команде
+            if (hasRoleId(message.author)){
+                if(numArg === 1) {
+                    //Если указали только название команды
+                    message.reply({ content: `:exclamation: Неверно указана команда.\nИспользуй: \`${prefix}бан @Ник Причина_бана\``, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
+                    return;
+                }
+                //Пользователь не найден
+                if (!user){
+                    message.reply({ content: `\n:no_pedestrians: Указанный пользователь не найден!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Попытка самого себя забанить
+                if (user.id == message.author.id){
+                    message.reply({ content: `\n:no_entry_sign: Ты не можешь забанить себя!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Проверяем Администратор или Модератор 
+                if (hasRoleId(user)){
+                    message.reply({ content: `\n:no_entry_sign: Нельзя забанить пользователя с правами **Администратор** или **Модераторы**!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Попытка забанить бота
+                if (user.user.bot){
+                    message.reply({ content: `\n:robot: Чем тебе бот помешал, мешок с костями? Ты не можешь забанить бота!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Не указана причина бана
+                if (!reas){
+                    reas = "Увы, не указана причина бана";
+                }
+                //Отправляем пользователю, которого забанили, сообщение
+                user.send({ content: ">>> Тебя забанили на сервере **" + nameSrv + "**\nПричина: " + reas});
+                //Баним пользователя на сервере
+                user.ban({ reason: reas });
+                //Проверяем наличие канала, куда будем отправлять сообщение
+                let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+                if(!logChannel) return;
+                //Канал для отправки сообщения
+                let sysCh = client.channels.cache.get(idChMsg);
+                //Формирование
+                sysCh.send({ embeds: [EmbMsg(':diamonds: :no_pedestrians: **[ЗАБАНИЛИ ПОЛЬЗОВАТЕЛЯ]**',0xFF3700,`Пользователя ${user}\nНик: \`${user.displayName}\`\nTag: \`${user.user.username}#${user.user.discriminator}\`\n\nКто забанил:\n${message.author}\n\nПричина:\n${reas}`)]});
+            } else {
+                //Если нет таких прав
+                message.reply({ content: `\n:no_entry_sign: Недостаточно прав для данной команды!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
             }
         } else {
             //лично
