@@ -294,6 +294,119 @@ client.on('messageCreate', message => {
         }
     }
 
+    /* Подбросить монетку */
+    else if (command === "бот") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nВыдаёт информацию о данном боте.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/kWHcX2v.gif')]});
+            return;
+        }
+        if(numArg === 1) {
+            //id Автора бота
+            const autorID = '307427459450798080';
+            const infoSrv = client.guilds.cache;
+            //Кол-во пользователей
+            const memCount = infoSrv.map(guild => guild.memberCount).join("\n");
+            //Получаем содержимое package.json
+            let json = require(__dirname + '/package.json');
+            function msToTime(millis) {
+                var weeks, days, hours, minutes, seconds, total_hours, total_minutes, total_seconds;
+                var totalT = '';
+                total_seconds = parseInt(Math.floor(millis / 1000));
+                total_minutes = parseInt(Math.floor(total_seconds / 60));
+                total_hours = parseInt(Math.floor(total_minutes / 60));
+                seconds = parseInt(total_seconds % 60);
+                minutes = parseInt(total_minutes % 60);
+                hours = parseInt(total_hours % 24);
+                days = parseInt(Math.floor(total_hours / 24));
+                weeks = parseInt(Math.floor(days / 7));
+                if (weeks > 0) {
+                    totalT += weeks + "нед ";
+                }
+                if (days > 0) {
+                    totalT += days + "д ";
+                }
+                if (hours > 0) {
+                    totalT += hours + "ч ";
+                }
+                if (minutes > 0) {
+                    totalT += minutes + "м ";
+                }
+                if (seconds > 0) {
+                    totalT += seconds + "с";
+                }
+                return totalT;
+            }
+            var timeOnline = Date.now()-startBot;
+            message.reply({ embeds: [EmbMsg(':robot: О БОТЕ', 0x82E9FF, `\n**Версия бота: **${json.version}\n**Автор бота:** <@${autorID}>\n\n**Работает в сети:**\n${msToTime(timeOnline)}\n\n**Пользователей на сервере: **${memCount}`)]});
+        }
+        if(numArg > 2) {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0x82E9FF, `\nДопущена ошибка при вводе команды.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``)]});
+            return;
+        }
+    }
+
+    /* Удаление сообщений */
+    else if (command === "удалить") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет удалить n-число сообщений в текстовом канале.\n\n**Пример набора команды**\n\`\`\`${prefix}${command} n\`\`\``, 'https://i.imgur.com/FEuW1U5.gif')]});
+            return;
+        }
+        //Проверяем куда была отправленна данная команда
+        if (privateMsg() == false){
+            //публично
+            //Получаем ID владельца сервера
+            //const ownerSrvID = bot.guilds.cache.map(guild => guild.ownerID).join("\n");
+            if (hasRoleId(message.author) && message.author.id === ownerSrvID){
+                //И есть права необходимые
+                if(numArg >= 3){
+                    message.channel.send(`:exclamation: Ты указал много аргументов.\nИспользуй команду: \`${prefix}удалить (количество сообщений)\``);
+                } else {
+                    let msg;
+                    //Считаем сколько удалять сообщений
+                    if(numArg === 1) {
+                        //Если указали только название команды
+                        msg = 2;
+                        //Удаляем одно сообщение
+                        message.channel.bulkDelete(msg);
+                    } else {
+                        //Берём количество из аргумента +1 (самой команды)
+                        //Проверяем аргумент количества - число или нет
+                        if (isNaN(parseInt(args[0]))) {
+                            //console.log('Агрумент не число');
+                            message.channel.send(`:exclamation: Количество удаляемых сообщений указываем **числом**.\nИспользуй: \`${prefix}удалить (количество сообщений)\``);
+                        } else {
+                            //console.log('Аргумент число');
+                            if (parseInt(args[0]) < 0){
+                                message.channel.send(`:exclamation: Количество удаляемых сообщений не должно быть отрицательным.`);
+                            } else {
+                                //Если количество сообщений положительное число
+                                msg = parseInt(args[0]) + 1;
+                                //Проверяем на лимит
+                                if (parseInt(args[0]) >= 98){
+                                    message.channel.send(`:exclamation: Количество одновременно удаляемых сообщений должно быть меньше **98**.`);
+                                } else {
+                                    //удаляем N количество сообщений
+                                    message.channel.bulkDelete(msg);
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                //Если нет таких прав
+                //message.reply(`\n:no_entry_sign: Недостаточно прав для данной команды!`);
+                message.reply({ content: `\n:no_entry_sign: Недостаточно прав для данной команды!`, allowedMentions: { repliedUser: false }});
+            }
+        } else {
+            //лично
+            //message.reply(`:no_entry_sign: **Данная команда здесь недоступна!**`);
+            message.reply({ content: `:no_entry_sign: **Данная команда здесь недоступна!**`, allowedMentions: { repliedUser: false }});
+        }
+    }
+
 
 
 
