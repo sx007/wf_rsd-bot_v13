@@ -1673,6 +1673,157 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     }
 });
 
+//Сообщаем о новом пользователе на сервере
+client.on('guildMemberAdd', member => {
+    //Проверяем наличие канала, куда будем отправлять сообщение
+    let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+    if(!logChannel) return;
+
+    //Канал для отправки сообщения
+    let sysCh = client.channels.cache.get(idChMsg);
+    //Формирование
+    sysCh.send({ embeds: [EmbMsg('**[Новый пользователь]**', 0xFDFDFD, `Пользователь ${member}\nНик: \`${member.displayName}\`\nНик: \`${member.user.username}#${member.user.discriminator}\`\n\nтолько что зашёл на сервер`)]});
+
+    //Отправляем в личку сообщение пользователю 
+    //Название сервера
+    const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
+    member.send({ content: `>>> Добро пожаловать на сервер **${nameSrv}**!\n\n**1.** Необходимо сменить свой ник на нашем сервере по шаблону **Ник в игре (Ваше имя)**.\nПример: **ТащерДжек (Вася)**\n\n**2.** В текстовом канале **#welcome** есть краткая информация о ролях, кто может их выдать. А так же информация о текстовых и голосовых каналах.\n\n**3.** В текстовом канале **#rules** ознакомьтесь с правилами нашего сервера.\n\nСписок доступных команд бота можно узнать с помощью команды:\n\`\`\`${prefix}команды\`\`\``, allowedMentions: { repliedUser: false }});
+});
+
+//Сообщаем о пользователе, который покинул сервер
+client.on('guildMemberRemove', member => {
+    //Проверяем наличие канала, куда будем отправлять сообщение
+    let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+    if(!logChannel) return;
+    //Канал для отправки сообщения
+    let sysCh = client.channels.cache.get(idChMsg);
+    //Формирование
+    sysCh.send({ embeds: [EmbMsg('**[Покинул пользователь]**', 0xFDFDFD, `Пользователь ${member}\nНик: \`${member.displayName}\`\nНик: \`${member.user.username}#${member.user.discriminator}\`\n\nпокинул наш сервер`)]});
+});
+
+/* Проверка на изменение прав, ника, аватара */
+client.on('guildMemberUpdate', function(oldMember, newMember) {
+    //Проверяем наличие канала, куда будем отправлять сообщение
+    let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+    if(!logChannel) return;
+    //Канал для отправки сообщения
+    let sysCh = client.channels.cache.get(idChMsg);
+
+    //объявляем изменения
+    var Changes = {
+        unknown: 0,
+        addedRole: 1,
+        removedRole: 2,
+        username: 3,
+        nickname: 4,
+    };
+    var change = Changes.unknown;
+
+    //Если изменился личный ник пользователя
+    if (newMember.user.username !== oldMember.user.username)
+        change = Changes.username;
+    //Если изменился серверный ник пользователя
+    if (newMember.nickname !== oldMember.nickname)
+        change = Changes.nickname;
+    //Если добавили роль
+    var addedRole = '';
+    if (oldMember.roles.cache.size < newMember.roles.cache.size) {
+        change = Changes.addedRole;
+        //Получаем название роли
+        for (const role of newMember.roles.cache.map(x => x.id)) {
+            if (!oldMember.roles.cache.has(role)) {
+                addedRole = oldMember.guild.roles.cache.get(role).name;
+            }
+        }
+    }
+    //Если удалили роль
+    var removedRole = '';
+    if (oldMember.roles.cache.size > newMember.roles.cache.size) {
+        change = Changes.removedRole;
+        //Получаем название роли
+        for (const role of oldMember.roles.cache.map(x => x.id)) {
+            if (!newMember.roles.cache.has(role)) {
+                removedRole = oldMember.guild.roles.cache.get(role).name;
+            }
+        }
+    }
+
+    //Отправляем сообщение в канал
+    var log = newMember.guild.channels.cache.find(ch => ch.id === idChMsg);
+    let info = '';
+    if (log) {
+        switch (change) {
+            //Неизвестное изменение
+            case Changes.unknown:
+                //info = `Пользователь <@${newMember.id}>\nНик: \`${newMember.nickname}\`\nTag: \`${newMember.user.username}#${newMember.user.discriminator}\`\n\nобновил информацию.`;
+                //sysCh.send({ embeds: [EmbMsg('**[ИЗМЕНИЛАСЬ ИНФОРМАЦИЯ]**', 0x50E3C2, info)]}));
+                break;
+            //Смена ника пользователя
+            case Changes.username:
+                info = `Пользователь сменивший личный ник: <@${oldMember.id}>\nНик: \`${oldMember.nickname}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\n**Старый ник:**\n${oldMember.user.username}#${oldMember.user.discriminator}\n**Новый ник:**\n${newMember.user.username}#${newMember.user.discriminator}`;
+                sysCh.send({ embeds: [EmbMsg('**[ИЗМЕНЕН ЛИЧНЫЙ НИК]**', 0x50E3C2, info)]});
+                break;
+            //Смена серверного ника
+            case Changes.nickname:
+                //Ковыряемся в Журнале серверном
+                newMember.guild.fetchAuditLogs().then(logs => {
+                    //Получения id пользователя, который выполнил непосредственно
+                    var userID = logs.entries.first().executor.id;
+                    let oldNick = '';
+                    let newNick = '';
+                    //Если первоначальный ник - по умолчанию
+                    if (oldMember.nickname != null){
+                        oldNick = oldMember.nickname;
+                    } else {
+                        oldNick = 'По умолчанию';
+                    }
+                    //Если новый ник - по умолчанию
+                    if (newMember.nickname != null){
+                        newNick = newMember.nickname;
+                    } else {
+                        newNick = 'По умолчанию';
+                    }
+                    info = `У кого сменился серверный ник: <@${oldMember.id}>\nНик: \`${oldNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\n**Старый ник:**\n\`${oldNick}\`\n**Новый ник:**\n\`${newNick}\`\n\nКто сменил:\n<@${userID}>`;
+                    //Отправляем сообщение
+                    sysCh.send({ embeds: [EmbMsg(':repeat: **[ИЗМЕНЕН СЕРВЕРНЫЙ НИК]**', 0x50E3C2, info)]});
+                })
+                break;
+            //Добавление прав/роли
+            case Changes.addedRole:
+                //Ковыряемся в Журнале серверном
+                newMember.guild.fetchAuditLogs().then(logs => {
+                    //Получения id пользователя, который выполнил непосредственно
+                    var userID = logs.entries.first().executor.id;
+                    let nickuser = newMember.nickname;
+                    if (nickuser == null) {
+                        nickuser = 'По умолчанию';
+                    }
+                    //формируем сообщение
+                    info = `**Кому добавили:**<@${newMember.id}>\nНик: \`${nickuser}\`\nTag: \`${newMember.user.username}#${newMember.user.discriminator}\`\n\n**Роль:**\n __${addedRole}__\n\nКто добавил:\n<@${userID}>`;
+                    //Отправляем сообщение
+                    sysCh.send({ embeds: [EmbMsg(':warning: **[ДОБАВЛЕНА РОЛЬ]**', 0x50E3C2, info)]});
+                })
+                break;
+            //Удаление прав/роли
+            case Changes.removedRole:
+            //Ковыряемся в Журнале серверном
+            newMember.guild.fetchAuditLogs().then(logs => {
+                //Получения id пользователя, который выполнил непосредственно
+                var userID = logs.entries.first().executor.id;
+                let nickuser = newMember.nickname;
+                if (nickuser == null) {
+                    nickuser = 'По умолчанию';
+                }
+                //формируем сообщение
+                info = `**Кому удалили:**<@${newMember.id}>\nНик: \`${nickuser}\`\nTag: \`${newMember.user.username}#${newMember.user.discriminator}\`\n\n**Роль:**\n __${removedRole}__\n\nКто удалил:\n<@${userID}>`;
+                //Отправляем сообщение
+                sysCh.send({ embeds: [EmbMsg(':warning: **[УДАЛЕНА РОЛЬ]**', 0x50E3C2, info)]});
+            })
+            break;
+        }
+    }
+});
+
 
 //авторизация
 client.login(token);
