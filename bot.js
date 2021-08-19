@@ -63,7 +63,6 @@ client.on('messageCreate', message => {
 
     //Получаем ID владельца сервера
     const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
-    //console.log(ownerSrvID);
 
     //Проверка на личное сообщение
     function privateMsg(){
@@ -226,22 +225,18 @@ client.on('messageCreate', message => {
             if (hasRoleId(message.author)){
                 //И есть права необходимые
                 message.reply({ content: `Время генерации сообщения ${timeTaken}ms.`, allowedMentions: { repliedUser: false }});
-                //message.reply(`Время генерации сообщения ${timeTaken}ms.`);
             } else {
                 //Если нет таких прав
                 message.reply({ content: `У тебя нет прав для данной команды`, allowedMentions: { repliedUser: false }});
-                //message.reply(`У тебя нет прав для данной команды`);
             }
         } else {
             //Если личное сообщение
             if (hasRoleId(message.author)){
                 //И есть права необходимые
                 message.reply({ content: `Время генерации сообщения ${timeTaken}ms.`, allowedMentions: { repliedUser: false }});
-                //message.reply(`Время генерации сообщения ${timeTaken}ms.`);
             } else {
                 //Если нет таких прав
                 message.reply({ content: `У тебя нет прав для данной команды`, allowedMentions: { repliedUser: false }});
-                //message.reply(`У тебя нет прав для данной команды`);
             }
         }
     }
@@ -255,7 +250,6 @@ client.on('messageCreate', message => {
         }
         //Если сообщение публичное
         if (privateMsg() == false){
-            //console.log(message.author.id, " ", ownerSrvID);
             //Проверяем автора - владелец ли сервера
             if (message.author.id === ownerSrvID) {
                 //Если владелец, то перезапускаем бота
@@ -275,8 +269,28 @@ client.on('messageCreate', message => {
             } else {
                 //Если нет прав
                 message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
-                //message.reply(`:no_entry: **У вас нет прав для данной команды!**`);
             }
+        }
+    }
+
+    /* Подбросить монетку */
+    else if (command === "монетка") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nВыдаёт случайный результат подброса монетки.\n\nВарианты:\nОрёл, решка или упала на ребро.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/zaQC0LS.gif')]});
+            return;
+        }
+        //Вычисляем случайное число от 1 до 3
+        var random = Math.floor(Math.random() * 4) + 1;
+        if (random === 1) {
+            //Если число = 1, то выпадает орёл.
+            message.reply({ content: ':full_moon: Орёл!', allowedMentions: { repliedUser: false }});
+        } else if (random === 2) { 
+            //Если число = 2, то выпадает решка.
+            message.reply({ content: ':new_moon: Решка!', allowedMentions: { repliedUser: false }});
+        } else if (random === 3) { 
+            //Если число = 3, то монета падает ребром.
+            message.reply({ content: ':last_quarter_moon: Монета упала ребром!', allowedMentions: { repliedUser: false }});
         }
     }
 
