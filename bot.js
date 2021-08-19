@@ -20,7 +20,7 @@ const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 const startBot = Date.now();
 
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
+const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_VOICE_STATES],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 
 //Получаем ID владельца сервера
 const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
@@ -1526,25 +1526,152 @@ client.on('messageCreate', message => {
             })
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 });
 
+/* Проверяем изменения голосовых каналов */
+client.on('voiceStateUpdate', (oldState, newState) => {
+    //console.log("🔴", oldState.voiceChannel);
+    //console.log("🔵", newState.voiceChannel);
+    //Проверяем наличие канала, куда будем отправлять сообщение
+    let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+    if(!logChannel) return;
+    //Канал для отправки сообщения
+    let sysCh = client.channels.cache.get(idChMsg);
+    //id AFK канала сервера
+    const afkSrv = client.guilds.cache.map(guild => guild.afkChannelId).join("\n");
 
+    //информация о каналах и пользователе
+    let oldChannel = oldState.channel;
+    let newChannel = newState.channel;
+    let oldMember = oldState.member;
+    let newMember = newState.member;
+    let srvNick = '';
+    //Проверяем серверный ник
+    if(oldMember.nickname == null){
+        srvNick = 'По умолчанию';
+    } else {
+        srvNick = oldMember.nickname;
+    }
+    //Заготовка для Embed сообщения
+    function EmbedMsg(color, Descr){
+        let embed = new MessageEmbed()
+        .setColor(color)
+        .setDescription(Descr)
+        .setFooter("Бот клана", "")
+        .setTimestamp()
+        return embed;
+    }
+
+    //Пользователь подключился к голосовому каналу
+    if(!oldState.channel && newState.channel) {
+        let info = `Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nподключился к каналу:\n${newChannel.name}`;
+        sysCh.send({ embeds: [EmbedMsg(0x005F31, info)]});
+    }
+    //Пользователь вышел из голосового канала
+    if(oldState.channel && !newState.channel) {
+        let info = `Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nпокинул канал:\n${oldChannel.name}`;
+        sysCh.send({ embeds: [EmbedMsg(0x5F0000, info)]});
+    }
+    //Пользователь перешёл из голосового канала в другой
+    if(oldState.channel && newState.channel && newChannel !== oldChannel) {
+        //Получаем информацию из логов
+        newMember.guild.fetchAuditLogs().then(logs => {
+            //Получения последней записи в логах
+            let firstEv = logs.entries.first();
+            //Сравниваем дату последнего лога и текущей даты
+            if (Date.now() - firstEv.createdTimestamp < 5000) {
+                //Получения id пользователя, который выполнил непосредственно
+                let userID = logs.entries.first().executor.id;
+                var info = `Пользователя <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперетащили из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}\n\nКто перетащил:\n<@${userID}>`;
+            } else {
+                //Если пользователь сам перешёл в голосовой канал
+                var info = `Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперешёл из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}`;
+            }
+            //Отправляем сообщение
+            sysCh.send({ embeds: [EmbedMsg(0x002D5F, info)]});
+        });
+    }
+    //Пользователь выключил микрофон
+    if(oldState.selfMute === false && newState.selfMute === true) {
+        let info = `:microphone: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nотключил микрофон.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь включил микрофон
+    if(oldState.selfMute === true && newState.selfMute === false && oldState.channel.id !== afkSrv) {
+        let info = `:microphone: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключил микрофон.`;
+        sysCh.send(EmbedMsg(0x8B572A, info));
+    }
+    //Пользователь отключил звук
+    if(oldState.selfDeaf === false && newState.selfDeaf === true && newState.channel.id !== afkSrv){
+        let info = `:mute: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nотключил звук.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь включил звук
+    if(oldState.selfDeaf === true && newState.selfDeaf === false){
+        let info = `:loud_sound: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключил звук.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь включил камеру
+    if(oldState.selfVideo === false && newState.selfVideo === true){
+        let info = `:film_frames: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключил камеру.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь выключил камеру
+    if(oldState.selfVideo === true && newState.selfVideo === false){
+        let info = `:film_frames: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключил камеру.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь включил стрим
+    if(oldState.streaming === false && newState.streaming === true){
+        let info = `:red_circle: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключил стрим.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователь выключил стрим
+    if(oldState.streaming === true && newState.streaming === false){
+        let info = `:red_circle: Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключил стрим.`;
+        sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+    }
+    //Пользователю выключили микрофон на сервере
+    if(oldState.serverMute === false && newState.serverMute === true){
+        //Полуаем из логов кто это сделал
+        newMember.guild.fetchAuditLogs().then(logs => {
+            //Получения id пользователя, который выполнил непосредственно
+            let userID = logs.entries.first().executor.id;
+            let info = `:large_orange_diamond: :microphone: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключили микрофон на сервере.\n\nКто отключил:\n<@${userID}>`;
+            sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+        });
+    }
+    //Пользователю включили микрофон на сервере
+    if(oldState.serverMute === true && newState.serverMute === false){
+        //Полуаем из логов кто это сделал
+        newMember.guild.fetchAuditLogs().then(logs => {
+            //Получения id пользователя, который выполнил непосредственно
+            let userID = logs.entries.first().executor.id;
+            let info = `:large_orange_diamond: :microphone: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключили микрофон на сервере.\n\nКто включил:\n<@${userID}>`;
+            sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+        });
+    }
+    //Пользователю выключили звук на сервере
+    if(oldState.serverDeaf === false && newState.serverDeaf === true){
+        //Полуаем из логов кто это сделал
+        newMember.guild.fetchAuditLogs().then(logs => {
+            //Получения id пользователя, который выполнил непосредственно
+            let userID = logs.entries.first().executor.id;
+            let info = `:large_orange_diamond: :mute: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключили звук на сервере.\n\nКто отключил:\n<@${userID}>`;
+            sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+        });
+    }
+    //Пользователю включили звук на сервере
+    if(oldState.serverDeaf === true && newState.serverDeaf === false){
+        //Полуаем из логов кто это сделал
+        newMember.guild.fetchAuditLogs().then(logs => {
+            //Получения id пользователя, который выполнил непосредственно
+            let userID = logs.entries.first().executor.id;
+            let info = `:large_orange_diamond: :loud_sound: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключили звук на сервере.\n\nКто включил:\n<@${userID}>`;
+            sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
+        });
+    }
+});
 
 
 //авторизация
