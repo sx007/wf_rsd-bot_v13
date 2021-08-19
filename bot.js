@@ -255,30 +255,26 @@ client.on('messageCreate', message => {
         }
         //Если сообщение публичное
         if (privateMsg() == false){
-            console.log(message.author.id, " ", ownerSrvID);
+            //console.log(message.author.id, " ", ownerSrvID);
             //Проверяем автора - владелец ли сервера
             if (message.author.id === ownerSrvID) {
                 //Если владелец, то перезапускаем бота
-                //message.reply(`:robot: :repeat: **Бот перезапускается!**`).then(m => m.delete({timeout: 15000}));
                 console.log("Restart bot ...");
                 process.exit(1);
             } else {
                 //Если нет прав
-                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }});
-                //setTimeout(() => message.delete(), 20000);
-                //message.reply(`:no_entry: **У вас нет прав для данной команды!**`).then(m => m.delete({timeout: 20000}));
+                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
             }
         } else {
             //Если личное сообщение
             //Проверяем автора - владелец ли сервера
             if (message.author.id === ownerSrvID) {
                 //Если владелец, то перезапускаем бота
-                //message.reply(`:robot: :repeat: **Бот перезапускается!**`);
                 console.log("Restart bot ...");
                 process.exit(1);
             } else {
                 //Если нет прав
-                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }});
+                message.reply({ content: `:no_entry: **У вас нет прав для данной команды!**`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
                 //message.reply(`:no_entry: **У вас нет прав для данной команды!**`);
             }
         }
