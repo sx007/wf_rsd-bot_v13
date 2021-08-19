@@ -357,12 +357,10 @@ client.on('messageCreate', message => {
         //Проверяем куда была отправленна данная команда
         if (privateMsg() == false){
             //публично
-            //Получаем ID владельца сервера
-            //const ownerSrvID = bot.guilds.cache.map(guild => guild.ownerID).join("\n");
             if (hasRoleId(message.author) && message.author.id === ownerSrvID){
                 //И есть права необходимые
                 if(numArg >= 3){
-                    message.channel.send(`:exclamation: Ты указал много аргументов.\nИспользуй команду: \`${prefix}удалить (количество сообщений)\``);
+                    message.channel.send({ content: `:exclamation: Ты указал много аргументов.\nИспользуй команду: \`${prefix}удалить (количество сообщений)\``});
                 } else {
                     let msg;
                     //Считаем сколько удалять сообщений
@@ -376,17 +374,17 @@ client.on('messageCreate', message => {
                         //Проверяем аргумент количества - число или нет
                         if (isNaN(parseInt(args[0]))) {
                             //console.log('Агрумент не число');
-                            message.channel.send(`:exclamation: Количество удаляемых сообщений указываем **числом**.\nИспользуй: \`${prefix}удалить (количество сообщений)\``);
+                            message.channel.send({ content: `:exclamation: Количество удаляемых сообщений указываем **числом**.\nИспользуй: \`${prefix}удалить (количество сообщений)\``});
                         } else {
                             //console.log('Аргумент число');
                             if (parseInt(args[0]) < 0){
-                                message.channel.send(`:exclamation: Количество удаляемых сообщений не должно быть отрицательным.`);
+                                message.channel.send({ content: `:exclamation: Количество удаляемых сообщений не должно быть отрицательным.`});
                             } else {
                                 //Если количество сообщений положительное число
                                 msg = parseInt(args[0]) + 1;
                                 //Проверяем на лимит
                                 if (parseInt(args[0]) >= 98){
-                                    message.channel.send(`:exclamation: Количество одновременно удаляемых сообщений должно быть меньше **98**.`);
+                                    message.channel.send({ content: `:exclamation: Количество одновременно удаляемых сообщений должно быть меньше **98**.`});
                                 } else {
                                     //удаляем N количество сообщений
                                     message.channel.bulkDelete(msg);
@@ -397,13 +395,82 @@ client.on('messageCreate', message => {
                 }
             } else {
                 //Если нет таких прав
-                //message.reply(`\n:no_entry_sign: Недостаточно прав для данной команды!`);
                 message.reply({ content: `\n:no_entry_sign: Недостаточно прав для данной команды!`, allowedMentions: { repliedUser: false }});
             }
         } else {
             //лично
-            //message.reply(`:no_entry_sign: **Данная команда здесь недоступна!**`);
             message.reply({ content: `:no_entry_sign: **Данная команда здесь недоступна!**`, allowedMentions: { repliedUser: false }});
+        }
+    }
+
+    /* Выгнать пользователя с сервера */
+    else if (command === "кик") {
+        if(numArg === 2 && args[0] === "?") {
+            //Выдаём справку по данной команде
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет выгнать (кикнуть) пользователя с сервера.\n\nУказываем пользователя через знак @\nЧерез пробел можно указать причину кика с сервера.\n\n**Пример набора команды**\n\`\`\`${prefix}${command} @пользователь причина\`\`\``, 'https://i.imgur.com/87RRitG.gif')]});
+            return;
+        }
+        //Название сервера
+        const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
+        //Проверяем куда была отправленна данная команда
+        if (privateMsg() == false){
+            //публично
+            let user = message.mentions.members.first() || message.guild.members.cache.get(args[0]);
+            let reas = args.slice(1).join(' ');
+            //Если автор сообщения - Бот
+            if (message.author.bot){
+                return;
+            };
+            //Проверяем права на доступ к данной команде
+            if (hasRoleId(message.author)){
+                if(numArg === 1) {
+                    //Если указали только название команды
+                    message.reply({ content: `:exclamation: Неверно указана команда.\nИспользуй: \`${prefix}кик @Ник Причина_кика\``, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
+                    return;
+                }
+                //Пользователь не найден
+                if (!user){
+                    message.reply({ content: `\n:no_pedestrians: Указанный пользователь не найден!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Попытка самого себя кикнуть
+                if (user.id == message.author.id){
+                    message.reply({ content: `\n:no_entry_sign: Ты не можешь кикнуть себя!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Проверяем Администратор или Модератор 
+                if (hasRoleId(user)){
+                    message.reply({ content: `\n:no_entry_sign: Нельзя кикнуть пользователя с правами **Администратор** или **Модераторы**!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Попытка кикнуть бота
+                if (user.user.bot){
+                    message.reply({ content: `\n:robot: Чем тебе бот помешал, мешок с костями? Ты не можешь кикнуть бота!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 15000));
+                    return;
+                }
+                //Не указана причина кика
+                if (!reas){
+                    reas = "Увы, не указана причина кика";
+                }
+                //Отправляем пользователю, которого кикнули, сообщение
+                //user.send(">>> Тебя кикнули с сервера **" + nameSrv + "**\nПричина: " + reas);
+                user.send({ content: ">>> Тебя кикнули с сервера **" + nameSrv + "**\nПричина: " + reas});
+                //Кикаем пользователя с сервера
+                user.kick(reas);
+                //Проверяем наличие канала, куда будем отправлять сообщение
+                let logChannel = client.channels.cache.find(ch => ch.id === idChMsg);
+                if(!logChannel) return;
+                //Канал для отправки сообщения
+                let sysCh = client.channels.cache.get(idChMsg);
+                //Формирование
+                sysCh.send({ embeds: [EmbMsg(':diamonds: :no_pedestrians: **[КИКНУЛИ ПОЛЬЗОВАТЕЛЯ]**',0xFF3700,`Пользователя ${user}\nНик: \`${user.displayName}\`\nTag: \`${user.user.username}#${user.user.discriminator}\`\n\nКто кикнул:\n${message.author}\n\nПричина:\n${reas}`)]});
+            } else {
+                //Если нет таких прав
+                message.reply({ content: `\n:no_entry_sign: Недостаточно прав для данной команды!`, allowedMentions: { repliedUser: false }}).then(m => setTimeout(() => m.delete(), 20000));
+            }
+        } else {
+            //лично
+            message.reply({ content: `:no_entry_sign: Данная команда здесь недоступна!`, allowedMentions: { repliedUser: false }});
         }
     }
 
