@@ -1,4 +1,4 @@
-const { Client, Intents, MessageEmbed, Permissions,  } = require('discord.js');
+const { Client, Intents, MessageEmbed, CommandInteraction, Collection } = require('discord.js');
 var request = require('request');
 var express = require('express');
 
@@ -31,6 +31,186 @@ client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
     client.user.setPresence({ activities: [{ name: '⚠ В разработке ⚠' }], status: 'dnd' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
+
+    //Удаляем все ранее зарегистрированные команды
+    client.api.applications(client.user.id).commands.get().then((result) => {
+        //console.log(result);
+        var a = result;
+        var index, len;
+        for (index = 0, len = a.length; index < len; ++index) {
+            //console.log(a[index]['name'],a[index]['id']);
+            client.api.applications(client.user.id).commands(a[index]['id']).delete();
+        }
+    });
+    //Регистрируем глобальные slash-команды
+    /*
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'embed',
+        description: 'Displays embed',
+        options: [{
+            name: 'name',
+            description: 'Your Name',
+            required: true,
+            type: 3
+            },
+            {
+            name: 'age',
+            description: 'Your Age',
+            required: false,
+            type: 4
+            }
+        ]
+        },
+    });
+    */
+
+    
+    /*
+    client.api.applications(client.user.id).commands.post({
+        data: {
+            name: "poka",
+            description: "Скажет 'Bi-Bi!'"
+        }
+    });
+    */
+    const roleId = "312756322917679105";
+    const guildId = "307431674671792129";
+    //const commandId = "";
+
+    //Наделяем правами зарегистрированные команды
+    /*
+    client.api.applications(client.user.id).commands.get().then((result) => {
+        //console.log(result);
+        var a = result;
+        var index, len;
+        for (index = 0, len = a.length; index < len; ++index) {
+            //console.log(a[index]['name'],a[index]['id']);
+            //Наделяем правами установленные команды
+            client.application.commands.permissions.set({
+                guild: guildId,
+                command: a[index]['id'],
+                permissions: [
+                    {
+                        id: roleId,
+                        type: 1,
+                        permission: true
+                    }
+                ]
+            });
+        }
+    });
+    */
+    //
+    client.api.applications(client.user.id).commands.get().then((result) => {
+        console.log(result);
+        var a = result;
+        var index, len;
+        if (a.length > 0) {
+            //
+            console.log("Больше 0");
+            for (index = 0, len = a.length; index < len; ++index) {
+                console.log(a[index]['name'],a[index]['id']);
+                //client.api.applications(client.user.id).commands(a[index]['id']).delete();
+            }
+        } else {
+            console.log("Меньше 0");
+            client.api.applications(client.user.id).commands.post({
+                data: {
+                name: 'боец',
+                description: 'Отобразить информацию о бойце',
+                options: [{
+                    name: 'ник',
+                    description: 'Игровой ник',
+                    required: true,
+                    type: 3
+                    },
+                    {
+                    name: 'Сервер',
+                    description: 'Укажите сервер, где искать',
+                    required: false,
+                    type: 3,
+                    choices: [
+                        {
+                            name: 'Альфа',
+                            value: 'animal_dog'
+                        },
+                        {
+                            name: 'Браво',
+                            value: 'animal_cat'
+                        },
+                        {
+                            name: 'Чарли',
+                            value: 'animal_penguin'
+                        }
+                    ]
+                    }
+                ]
+                },
+            });
+        }
+        
+    });
+    /*
+    // Listen for an interaction (e.g. user typed command)
+    client.ws.on("INTERACTION_CREATE", interaction => {
+        console.log(interaction);
+        
+        // Access command properties
+        const commandId = interaction.data.id;
+        const commandName = interaction.data.name;
+        
+        // Reply only to commands with name 'hello'
+        if (commandName == "hello") {
+            // Reply to an interaction
+            client.api.interactions(interaction.id, interaction.token).callback.post({
+                data: {
+                    type: 4,
+                    data: {
+                        content: "Hello, World!"
+                    }
+                }
+            });
+        }
+    });
+    */
+
+
+    /*
+    client.application.commands.permissions.set({
+        guild: guildId,
+        command: commandId,
+        permissions: [
+            {
+                id: roleId,
+                type: 1,
+                permission: true
+            }
+        ]
+    });
+    */
+    //client.api.applications(client.user.id).commands("878790646855499796").delete(); 
+    /*
+    client.api.applications(client.user.id).commands.get().then((result) => {
+        //console.log(result);
+        var a = result;
+        var index, len;
+        for (index = 0, len = a.length; index < len; ++index) {
+            console.log(a[index]['name'],a[index]['id']);
+        }
+    });
+    */
+
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+        console.log(interaction);
+        if (interaction.commandName === 'hello') {
+            await interaction.reply({ content: 'Pong!', ephemeral: true });
+        }
+    });
+
+    
+
 });
 
 //Заготовка для Embed сообщения (обычное)
@@ -872,7 +1052,7 @@ client.on('messageCreate', message => {
                         clInfo += "**Место в лиге:**   ``" + ((numRank-10)+1) + "``\n";
                     }
                     if (numRank  > 100 && numRank <= 500) {
-                        clInfo += "**��ига:**   ``Золотая``\n";
+                        clInfo += "**Лига:**   ``Золотая``\n";
                         clInfo += "**Место в лиге:**   ``" + ((numRank-100)+1) + "``\n";
                     }
                     if (numRank  > 500 && numRank <= 1000) {
@@ -1823,6 +2003,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
         }
     }
 });
+
 
 
 //авторизация
