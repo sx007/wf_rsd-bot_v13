@@ -1,6 +1,6 @@
 const { Client, Intents, MessageEmbed, CommandInteraction, Collection } = require('discord.js');
 var request = require('request');
-var express = require('express');
+//var express = require('express');
 
 //Токен
 const token = process.env.BOT_TOKEN;
@@ -32,6 +32,7 @@ client.on('ready', () => {
     client.user.setPresence({ activities: [{ name: '⚠ В разработке ⚠' }], status: 'dnd' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
 
+    /*работало
     //Удаляем все ранее зарегистрированные команды
     client.api.applications(client.user.id).commands.get().then((result) => {
         //console.log(result);
@@ -42,6 +43,11 @@ client.on('ready', () => {
             client.api.applications(client.user.id).commands(a[index]['id']).delete();
         }
     });
+    */
+
+
+
+
     //Регистрируем глобальные slash-команды
     /*
     client.api.applications(client.user.id).commands.post({
@@ -74,8 +80,13 @@ client.on('ready', () => {
         }
     });
     */
+
+    /*работало
     const roleId = "312756322917679105";
     const guildId = "307431674671792129";
+    */
+
+
     //const commandId = "";
 
     //Наделяем правами зарегистрированные команды
@@ -102,6 +113,8 @@ client.on('ready', () => {
     });
     */
     //
+
+    /*работало
     client.api.applications(client.user.id).commands.get().then((result) => {
         console.log(result);
         var a = result;
@@ -151,6 +164,13 @@ client.on('ready', () => {
         }
         
     });
+    */
+
+
+
+
+
+
     /*
     // Listen for an interaction (e.g. user typed command)
     client.ws.on("INTERACTION_CREATE", interaction => {
@@ -201,6 +221,8 @@ client.on('ready', () => {
     });
     */
 
+
+    /*работало
     client.on('interactionCreate', async interaction => {
         if (!interaction.isCommand()) return;
         console.log(interaction);
@@ -208,8 +230,7 @@ client.on('ready', () => {
             await interaction.reply({ content: 'Pong!', ephemeral: true });
         }
     });
-
-    
+    */
 
 });
 
