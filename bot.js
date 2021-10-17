@@ -1779,15 +1779,24 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         newMember.guild.fetchAuditLogs().then(logs => {
             //Получения последней записи в логах
             let firstEv = logs.entries.first();
-            //Сравниваем дату последнего лога и текущей даты
-            if (Date.now() - firstEv.createdTimestamp < 5000) {
-                //Получения id пользователя, который выполнил непосредственно
-                let userID = logs.entries.first().executor.id;
-                var info = `Пользователя <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперетащили из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}\n\nКто перетащил:\n<@${userID}>`;
-            } else {
+            //Есть ли записи аудит лог
+            if (!firstEv) {
+                //Если пусто
                 //Если пользователь сам перешёл в голосовой канал
                 var info = `Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперешёл из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}`;
+            } else {
+                //Если лог не пустой
+                //Сравниваем дату последнего лога и текущей даты
+                if (Date.now() - firstEv.createdTimestamp < 5000) {
+                    //Получения id пользователя, который выполнил непосредственно
+                    let userID = firstEv.executor.id;
+                    var info = `Пользователя <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперетащили из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}\n\nКто перетащил:\n<@${userID}>`;
+                } else {
+                    //Если пользователь сам перешёл в голосовой канал
+                    var info = `Пользователь <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nперешёл из канала:\n${oldChannel.name}\nв канал:\n${newChannel.name}`;
+                }
             }
+
             //Отправляем сообщение
             sysCh.send({ embeds: [EmbedMsg(0x002D5F, info)]});
         });
@@ -1838,6 +1847,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         newMember.guild.fetchAuditLogs().then(logs => {
             //Получения id пользователя, который выполнил непосредственно
             let userID = logs.entries.first().executor.id;
+            if (!userID) return;
             let info = `:large_orange_diamond: :microphone: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключили микрофон на сервере.\n\nКто отключил:\n<@${userID}>`;
             sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
         });
@@ -1848,6 +1858,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         newMember.guild.fetchAuditLogs().then(logs => {
             //Получения id пользователя, который выполнил непосредственно
             let userID = logs.entries.first().executor.id;
+            if (!userID) return;
             let info = `:large_orange_diamond: :microphone: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключили микрофон на сервере.\n\nКто включил:\n<@${userID}>`;
             sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
         });
@@ -1858,6 +1869,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         newMember.guild.fetchAuditLogs().then(logs => {
             //Получения id пользователя, который выполнил непосредственно
             let userID = logs.entries.first().executor.id;
+            if (!userID) return;
             let info = `:large_orange_diamond: :mute: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвыключили звук на сервере.\n\nКто отключил:\n<@${userID}>`;
             sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
         });
@@ -1868,6 +1880,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         newMember.guild.fetchAuditLogs().then(logs => {
             //Получения id пользователя, который выполнил непосредственно
             let userID = logs.entries.first().executor.id;
+            if (!userID) return;
             let info = `:large_orange_diamond: :loud_sound: Пользователю <@${oldMember.id}>\nНик: \`${srvNick}\`\nTag: \`${oldMember.user.username}#${oldMember.user.discriminator}\`\n\nвключили звук на сервере.\n\nКто включил:\n<@${userID}>`;
             sysCh.send({ embeds: [EmbedMsg(0x8B572A, info)]});
         });
@@ -1970,6 +1983,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
                 newMember.guild.fetchAuditLogs().then(logs => {
                     //Получения id пользователя, который выполнил непосредственно
                     var userID = logs.entries.first().executor.id;
+                    if (!userID) return;
                     let oldNick = '';
                     let newNick = '';
                     //Если первоначальный ник - по умолчанию
@@ -1995,6 +2009,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
                 newMember.guild.fetchAuditLogs().then(logs => {
                     //Получения id пользователя, который выполнил непосредственно
                     var userID = logs.entries.first().executor.id;
+                    if (!userID) return;
                     let nickuser = newMember.nickname;
                     if (nickuser == null) {
                         nickuser = 'По умолчанию';
@@ -2011,6 +2026,7 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
             newMember.guild.fetchAuditLogs().then(logs => {
                 //Получения id пользователя, который выполнил непосредственно
                 var userID = logs.entries.first().executor.id;
+                if (!userID) return;
                 let nickuser = newMember.nickname;
                 if (nickuser == null) {
                     nickuser = 'По умолчанию';
