@@ -1,6 +1,5 @@
 const { Client, Intents, MessageEmbed, CommandInteraction, Collection } = require('discord.js');
 var request = require('request');
-//var express = require('express');
 
 //Токен
 const token = process.env.BOT_TOKEN;
@@ -12,8 +11,6 @@ const idChMsg = process.env.ID_CHANNEL_SEND;
 const idSrv = process.env.ID_SERVER;
 //Название клана
 const clNm = process.env.CLAN_NAME;
-//Сервер клана
-//const clSr = process.env.CLAN_SRV;
 //ID ролей (Администраторов и Модераторов)
 const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 //Время старта бота
