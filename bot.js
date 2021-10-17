@@ -749,11 +749,11 @@ client.on('messageCreate', message => {
     else if (command === "боец") {
         if(numArg === 2 && args[0] === "?") {
             //Выдаём справку по данной команде
-            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите ник бойца, через пробел сервер на котором искать: **Альфа Браво Чарли**\n\nЕсли сервер не будет указан, то поиск будет производится на всех трёх серверах.\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца Сервер\`\`\``, 'https://i.imgur.com/N1CZPZM.gif')]});
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца\`\`\``, 'https://i.imgur.com/N1CZPZM.gif')]});
             return;
         }
         //парсинг данных с API
-        function parseApi(info, srv) {
+        function parseApi(info) {
             //Класс в игре
             function classGame(cl) {
                 //Проверяем
@@ -785,8 +785,6 @@ client.on('messageCreate', message => {
             var user = "";
             //Ник в игре
             user += "**Ник:**   ``" + info.nickname + "``\n";
-            //Игровой сервер
-            user += "**Игровой сервер:**   ``" + numSrvToStr(srv) + "``\n";
             //Клан
             if (info.clan_name) {
                 user += "**Клан:**   ``" + info.clan_name + "``\n";
@@ -812,187 +810,18 @@ client.on('messageCreate', message => {
         }
 
         //Если указали только название команды
-        if(numArg === 1 || numArg > 3) {
+        if(numArg === 1 || numArg > 2) {
             message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Укажите через пробел ник бойца, которого будите искать.\nТак же можно указать сервер через пробел.\n\nПример: \`${prefix}боец НикБойца Альфа\``)]}).then(m => setTimeout(() => m.delete(), 20000));
             return;
         }
-        //Если не указали где искать
+        //Если указали ник
         if(numArg === 2) {
+            //Ник бойца
             let uName = args[0].toLowerCase();
             //Проверяем указанный ник
             if (uName.length >= 4 && uName.length <= 16) {
-                //Номер сервера + Название сервера
-                let numSrv = 1;
-                let nameSrv = numSrvToStr(numSrv);
-                //Начинаем проверку на сервере Альфа
-                let link = "http://api.warface.ru/user/stat/?name=" + uName + "&server=" + numSrv;
-                let urlEnc = encodeURI(link);
-                var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
-                //Запрос
-                request(options, function(err, res, data){
-                    //Если ошибка
-                    if (err) {
-                        console.log('Error: ', err);
-                        message.reply({ embeds: [(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`))]}).then(m => setTimeout(() => m.delete(), 20000));
-                        return;
-                    }
-                    //Если нет ответа запроса
-                    if(!res) {
-                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                        return;
-                    } else {
-                        //Если статус запроса 200
-                        if (res.statusCode == 200) {
-                            //Нашли на Альфа
-                            if (IsJsonString(data) == true) {
-                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data, 1))]});
-                            }                        
-                        } else {
-                            //Неверный запрос
-                            if (res.statusCode == 400) {
-                                //Не нашли на Альфе
-                                if (data.message == "Пользователь не найден"){
-                                    //Не нашли на Альфе - надо дальше искать (Браво)
-                                    numSrv = numSrv+1;
-                                    nameSrv = numSrvToStr(numSrv);
-                                    let link = "http://api.warface.ru/user/stat/?name=" + uName + "&server=" + numSrv;
-                                    let urlEnc = encodeURI(link);
-                                    var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
-                                    //Запрос
-                                    request(options, function(err, res, data){
-                                        //Если ошибка
-                                        if (err) {
-                                            console.log('Error: ', err);
-                                            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                            return;
-                                        }
-                                        //Если нет ответа запроса
-                                        if(!res) {
-                                            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                            return;
-                                        } else {
-                                            //Если статус запроса 200
-                                            if (res.statusCode == 200) {
-                                                //Нашли на Браво
-                                                if (IsJsonString(data) == true) {
-                                                    message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data, 2))]});
-                                                }
-                                            } else {
-                                                //Неверный запрос
-                                                if (res.statusCode == 400) {
-                                                    //Не нашли на Браво
-                                                    if (data.message == "Пользователь не найден"){
-                                                        //надо дальше искать (Чарли)
-                                                        numSrv = numSrv+1;
-                                                        nameSrv = numSrvToStr(numSrv);
-                                                        let link = "http://api.warface.ru/user/stat/?name=" + uName + "&server=" + numSrv;
-                                                        let urlEnc = encodeURI(link);
-                                                        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
-                                                        //Запрос
-                                                        request(options, function(err, res, data){
-                                                            //Если ошибка
-                                                            if (err) {
-                                                                console.log('Error: ', err);
-                                                                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                                                return;
-                                                            }
-                                                            //Если нет ответа запроса
-                                                            if(!res) {
-                                                                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                                                return;
-                                                            } else {
-                                                                //Если статус запроса 200
-                                                                if (res.statusCode == 200) {
-                                                                    //Нашли на Чарли
-                                                                    if (IsJsonString(data) == true) {
-                                                                        message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data, 3))]});
-                                                                    }
-                                                                } else {
-                                                                    //Неверный запрос
-                                                                    if (res.statusCode == 400) {
-                                                                        //Не нашли даже на Чарли
-                                                                        if (data.message == "Пользователь не найден"){
-                                                                            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На всех трёх игровых серверах такой __боец не найден__`)]});
-                                                                        }
-                                                                        //Чарли
-                                                                        if (data.message == "Игрок скрыл свою статистику"){
-                                                                            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __статистика скрыта__`)]});
-                                                                        }
-                                                                        if (data.message == "Персонаж неактивен"){
-                                                                            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __персонаж неактивен__`)]});
-                                                                        }
-                                                                    }
-                                                                    //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
-                                                                    if (res.statusCode == 403 || res.statusCode == 404 || res.statusCode == 500) {
-                                                                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                                                    }
-                                                                }
-                                                            }
-                                                        });
-                                                    }
-                                                    //Браво
-                                                    if (data.message == "Игрок скрыл свою статистику"){
-                                                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __статистика скрыта__`)]});
-                                                    }
-                                                    if (data.message == "Персонаж неактивен"){
-                                                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __персонаж неактивен__`)]});
-                                                    }
-                                                }
-                                                //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
-                                                if (res.statusCode == 403 || res.statusCode == 404 || res.statusCode == 500) {
-                                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                                                }
-                                            }
-                                        }
-                                        
-                                    });
-                                }
-                                //Альфа
-                                if (data.message == "Игрок скрыл свою статистику"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __статистика скрыта__`)]});
-                                }
-                                if (data.message == "Персонаж неактивен"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __персонаж неактивен__`)]});
-                                }
-                            }
-                            //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
-                            if (res.statusCode == 403 || res.statusCode == 404 || res.statusCode == 500) {
-                                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                            }
-                        }
-                    }
-                });
-            } else {
-                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Указанный ник бойца должен быть **от 4 до 16 символов**`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                return;
-            }
-        }
-        //Если указали где искать
-        if(numArg === 3) {
-            //Ник бойца + сервер
-            let uName = args[0].toLowerCase();
-            //Проверяем указанный ник
-            if (uName.length >= 4 && uName.length <= 16) {
-                let uSrv = args[1].toLowerCase();
-                //Номер сервера + Название сервера
-                let numSrv;
-                let nameSrv;
-                //Проверяем указанное название сервера
-                if (uSrv == "альфа"){
-                    numSrv = 1;
-                    nameSrv = numSrvToStr(numSrv);
-                } else if (uSrv == "браво"){
-                    numSrv = 2;
-                    nameSrv = numSrvToStr(numSrv);
-                } else if (uSrv == "чарли"){
-                    numSrv = 3;
-                    nameSrv = numSrvToStr(numSrv);
-                } else {
-                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`**Неверно указан сервер.**\n\nДоступные варианты:\n\`Альфа Браво Чарли\``)]}).then(m => setTimeout(() => m.delete(), 20000));
-                    return;
-                }
                 //Начинаем проверку на указанном сервере
-                let link = "http://api.warface.ru/user/stat/?name=" + uName + "&server=" + numSrv;
+                let link = "http://api.warface.ru/user/stat/?name=" + uName;
                 let urlEnc = encodeURI(link);
                 var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
                 //Запрос
@@ -1011,19 +840,22 @@ client.on('messageCreate', message => {
                         //Если статус запроса 200
                         if (res.statusCode == 200) {
                             if (IsJsonString(data) == true) {
-                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data, numSrv))]});
+                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data))]});
                             }
                         } else {
                             //Неверный запрос
                             if (res.statusCode == 400) {
+                                if (data.message == "Ошибка: invalid response status"){
+                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Недействительный статус ответа сервера`)]});
+                                }
                                 if (data.message == "Пользователь не найден"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На указанном сервере такой __боец не найден__`)]});
+                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На сервере такой __боец не найден__`)]});
                                 }
                                 if (data.message == "Игрок скрыл свою статистику"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __статистика скрыта__`)]});
+                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __статистика скрыта__`)]});
                                 }
                                 if (data.message == "Персонаж неактивен"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере **${nameSrv}**\nНо его __персонаж неактивен__`)]});
+                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __персонаж неактивен__`)]});
                                 }
                             }
                             //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
