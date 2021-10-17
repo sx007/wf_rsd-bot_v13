@@ -746,7 +746,7 @@ client.on('messageCreate', message => {
     else if (command === "боец") {
         if(numArg === 2 && args[0] === "?") {
             //Выдаём справку по данной команде
-            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца\`\`\``, 'https://i.imgur.com/N1CZPZM.gif')]});
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца\`\`\``, 'https://i.imgur.com/7gHBgNN.gif')]});
             return;
         }
         //парсинг данных с API
@@ -872,7 +872,7 @@ client.on('messageCreate', message => {
     else if (command === "клан") {
         if(numArg === 2 && args[0] === "?") {
             //Выдаём справку по данной команде
-            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить информацию о клане в ежемесячном рейтинге.\n\nЧтобы получить информацию о нашем клане, достаточно набрать команду\n\`\`\`${prefix}${command}\`\`\`\nЧтобы получить информацю по другому клану, укажите название клана\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НазваниеКлана\`\`\``, 'https://i.imgur.com/fE7XPTZ.gif')]});
+            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить информацию о клане в ежемесячном рейтинге.\n\nЧтобы получить информацию о нашем клане, достаточно набрать команду\n\`\`\`${prefix}${command}\`\`\`\nЧтобы получить информацю по другому клану, укажите название клана\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НазваниеКлана\`\`\``, 'https://i.imgur.com/rPOFOEd.gif')]});
             return;
         }
         //парсинг данных с API
