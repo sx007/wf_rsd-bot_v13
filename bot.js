@@ -26,7 +26,7 @@ const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
 /* Вывод сообщения о работе и готовности бота */
 client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
-    client.user.setPresence({ activities: [{ name: '⚠ В разработке ⚠' }], status: 'dnd' });
+    client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
 
     /*работало
