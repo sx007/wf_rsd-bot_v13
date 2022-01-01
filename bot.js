@@ -308,7 +308,7 @@ function funCommands(authorRole, command, typeMsg){
     }
 }
 
-//Список команд
+//ВК
 function funVk(typeMsg){
     //Текстовый чат
     if (typeMsg == 0) {
@@ -382,19 +382,6 @@ client.on('messageCreate', message => {
             return true;
         }
         return false;
-    }
-
-    //Номер сервера в название
-    function numSrvToStr(num){
-        if (num == 1){
-            return "Альфа";
-        }
-        if (num == 2){
-            return "Браво";
-        }
-        if (num == 3){
-            return "Чарли";
-        }
     }
 
     //Удаление из текстого канала ссылок-приглашений
