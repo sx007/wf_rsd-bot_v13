@@ -9,6 +9,8 @@ const prefix = process.env.PREFIX;
 const idChMsg = process.env.ID_CHANNEL_SEND;
 //ID сервера
 const idSrv = process.env.ID_SERVER;
+//ID роли бота
+const idRoleBot = process.env.ID_ROLE_BOT;
 //Название клана
 const clNm = process.env.CLAN_NAME;
 //ID ролей (Администраторов и Модераторов)
@@ -19,8 +21,6 @@ const startBot = Date.now();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_VOICE_STATES],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 
-//Получаем ID владельца сервера
-const ownerSrvID = client.guilds.cache.map(guild => guild.ownerId).join("\n");
 
 
 /* Вывод сообщения о работе и готовности бота */
@@ -28,6 +28,72 @@ client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
     client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
+
+    //Регистрируем глобальные slash-команды
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'команды',
+        description: 'Отобразить список всех доступных команд бота'
+        },
+    });
+
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+        //Получаем id владельца сервера
+        const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
+        //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
+        function hasRoleId(mem){
+            var idRepl = idAdmMod.replace(/ +/g, ' ');
+            var idSplit = idRepl.split(' ');
+            var result = false;
+            //Перебираем ID в переменной
+            idSplit.forEach(function(idSplit) {
+                if (idSplit != '') {
+                    //Проверяем длинну ID
+                    if (idSplit.length === 18) {
+                        //Проверка указанного id сервера
+                        if (idSrv !== '' || idSrv.length === 18) {
+                            //Проверка роли
+                            var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
+                            //Находим среди пользователей с ролью автора сообщения
+                            if (members.indexOf(mem.id) != -1) {
+                                result = true;
+                            }
+                        }
+                    }
+                }
+            });
+            
+            //Выводим результат
+            return result;
+        }
+        //ниже проверял функцию наличия роли
+        //console.log('---', hasRoleId(interaction.user));
+
+        //Обработка slash-команд
+        if (interaction.commandName === 'команды') {
+            if (hasRoleId(interaction.user)) {
+                //Проверяем на права владельца сервера
+                if (interaction.user.id === ownerAdmID) {
+                    //Если есть права владельца
+                    await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
+                } else {
+                    //Если Администратор или Модератор
+                    await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
+                }
+            } else {
+                //Обычный пользователь
+                await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
+            }
+
+            console.log("Admin: ",ownerAdmID);
+            console.log("author id msg: ",interaction.user.id);
+
+            //await interaction.reply({ content: 'Список команд...', ephemeral: true });
+            //await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
+        }
+        
+    });
 
     /*работало
     //Удаляем все ранее зарегистрированные команды
@@ -78,9 +144,11 @@ client.on('ready', () => {
     });
     */
 
-    /*работало
-    const roleId = "312756322917679105";
-    const guildId = "307431674671792129";
+    /*работало 
+    //ID роли бота
+    const roleId = idRoleBot;
+    //ID_SERVER
+    const guildId = idSrv;
     */
 
 
@@ -231,6 +299,8 @@ client.on('ready', () => {
 
 });
 
+
+
 //Заготовка для Embed сообщения (обычное)
 function EmbMsg(title, color, descr){
     let embed = new MessageEmbed()
@@ -254,7 +324,7 @@ function EmbMsgHelp(title, color, descr, img){
     return embed;
 }
 
-//Заготовка для Кнопки
+//Заготовка для Кнопки-ссылки
 function MsgLink(link,linkdesc){
     let linkButton = new MessageActionRow()
     .addComponents(
@@ -265,6 +335,7 @@ function MsgLink(link,linkdesc){
         );
     return linkButton;
 }
+
 
 
 //Список команд
@@ -281,7 +352,8 @@ function funCommands(authorRole, command, typeMsg){
         }
         //slash команда
         if (typeMsg == 1) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}rs\`** перезагрузить бота\n**\`${prefixSlash}ping\`** узнать время генерации сообщения\n**\`${prefixSlash}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}rs\`** перезагрузить бота\n**\`${prefixSlash}ping\`** узнать время генерации сообщения\n**\`${prefixSlash}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды владельца`);
         }
     }
     //Команды админов и модераторов (из idAdmMod)
@@ -289,10 +361,12 @@ function funCommands(authorRole, command, typeMsg){
         //Текстовый чат
         if (typeMsg == 0) {
             return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
+            
         }
         //slash команда
         if (typeMsg == 1) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды админа и модератора`);
         }
     }
     //Команды прочие пользователи
@@ -303,7 +377,8 @@ function funCommands(authorRole, command, typeMsg){
         }
         //slash команда
         if (typeMsg == 1) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды пользователя`);
         }
     }
 }
@@ -1328,7 +1403,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
         let embed = new MessageEmbed()
         .setColor(color)
         .setDescription(Descr)
-        .setFooter("Бот клана", "")
+        .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
         .setTimestamp()
         return embed;
     }
