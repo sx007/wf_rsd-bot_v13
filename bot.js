@@ -22,285 +22,6 @@ const startBot = Date.now();
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_VOICE_STATES],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 
 
-
-/* Вывод сообщения о работе и готовности бота */
-client.on('ready', () => {
-    // Если всё хорошо, то выводим статус ему + в консоль информаию
-    client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
-    console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
-
-    //Регистрируем глобальные slash-команды
-    client.api.applications(client.user.id).commands.post({
-        data: {
-        name: 'команды',
-        description: 'Отобразить список всех доступных команд бота'
-        },
-    });
-
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
-        //Получаем id владельца сервера
-        const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
-        //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
-        function hasRoleId(mem){
-            var idRepl = idAdmMod.replace(/ +/g, ' ');
-            var idSplit = idRepl.split(' ');
-            var result = false;
-            //Перебираем ID в переменной
-            idSplit.forEach(function(idSplit) {
-                if (idSplit != '') {
-                    //Проверяем длинну ID
-                    if (idSplit.length === 18) {
-                        //Проверка указанного id сервера
-                        if (idSrv !== '' || idSrv.length === 18) {
-                            //Проверка роли
-                            var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
-                            //Находим среди пользователей с ролью автора сообщения
-                            if (members.indexOf(mem.id) != -1) {
-                                result = true;
-                            }
-                        }
-                    }
-                }
-            });
-            
-            //Выводим результат
-            return result;
-        }
-        //ниже проверял функцию наличия роли
-        //console.log('---', hasRoleId(interaction.user));
-
-        //Обработка slash-команд
-        if (interaction.commandName === 'команды') {
-            if (hasRoleId(interaction.user)) {
-                //Проверяем на права владельца сервера
-                if (interaction.user.id === ownerAdmID) {
-                    //Если есть права владельца
-                    await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
-                } else {
-                    //Если Администратор или Модератор
-                    await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
-                }
-            } else {
-                //Обычный пользователь
-                await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
-            }
-
-            console.log("Admin: ",ownerAdmID);
-            console.log("author id msg: ",interaction.user.id);
-
-            //await interaction.reply({ content: 'Список команд...', ephemeral: true });
-            //await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
-        }
-        
-    });
-
-    /*работало
-    //Удаляем все ранее зарегистрированные команды
-    client.api.applications(client.user.id).commands.get().then((result) => {
-        //console.log(result);
-        var a = result;
-        var index, len;
-        for (index = 0, len = a.length; index < len; ++index) {
-            //console.log(a[index]['name'],a[index]['id']);
-            client.api.applications(client.user.id).commands(a[index]['id']).delete();
-        }
-    });
-    */
-
-
-
-
-    //Регистрируем глобальные slash-команды
-    /*
-    client.api.applications(client.user.id).commands.post({
-        data: {
-        name: 'embed',
-        description: 'Displays embed',
-        options: [{
-            name: 'name',
-            description: 'Your Name',
-            required: true,
-            type: 3
-            },
-            {
-            name: 'age',
-            description: 'Your Age',
-            required: false,
-            type: 4
-            }
-        ]
-        },
-    });
-    */
-
-    
-    /*
-    client.api.applications(client.user.id).commands.post({
-        data: {
-            name: "poka",
-            description: "Скажет 'Bi-Bi!'"
-        }
-    });
-    */
-
-    /*работало 
-    //ID роли бота
-    const roleId = idRoleBot;
-    //ID_SERVER
-    const guildId = idSrv;
-    */
-
-
-    //const commandId = "";
-
-    //Наделяем правами зарегистрированные команды
-    /*
-    client.api.applications(client.user.id).commands.get().then((result) => {
-        //console.log(result);
-        var a = result;
-        var index, len;
-        for (index = 0, len = a.length; index < len; ++index) {
-            //console.log(a[index]['name'],a[index]['id']);
-            //Наделяем правами установленные команды
-            client.application.commands.permissions.set({
-                guild: guildId,
-                command: a[index]['id'],
-                permissions: [
-                    {
-                        id: roleId,
-                        type: 1,
-                        permission: true
-                    }
-                ]
-            });
-        }
-    });
-    */
-    //
-
-    /*работало
-    client.api.applications(client.user.id).commands.get().then((result) => {
-        console.log(result);
-        var a = result;
-        var index, len;
-        if (a.length > 0) {
-            //
-            console.log("Больше 0");
-            for (index = 0, len = a.length; index < len; ++index) {
-                console.log(a[index]['name'],a[index]['id']);
-                //client.api.applications(client.user.id).commands(a[index]['id']).delete();
-            }
-        } else {
-            console.log("Меньше 0");
-            client.api.applications(client.user.id).commands.post({
-                data: {
-                name: 'боец',
-                description: 'Отобразить информацию о бойце',
-                options: [{
-                    name: 'ник',
-                    description: 'Игровой ник',
-                    required: true,
-                    type: 3
-                    },
-                    {
-                    name: 'Сервер',
-                    description: 'Укажите сервер, где искать',
-                    required: false,
-                    type: 3,
-                    choices: [
-                        {
-                            name: 'Альфа',
-                            value: 'animal_dog'
-                        },
-                        {
-                            name: 'Браво',
-                            value: 'animal_cat'
-                        },
-                        {
-                            name: 'Чарли',
-                            value: 'animal_penguin'
-                        }
-                    ]
-                    }
-                ]
-                },
-            });
-        }
-        
-    });
-    */
-
-
-
-
-
-
-    /*
-    // Listen for an interaction (e.g. user typed command)
-    client.ws.on("INTERACTION_CREATE", interaction => {
-        console.log(interaction);
-        
-        // Access command properties
-        const commandId = interaction.data.id;
-        const commandName = interaction.data.name;
-        
-        // Reply only to commands with name 'hello'
-        if (commandName == "hello") {
-            // Reply to an interaction
-            client.api.interactions(interaction.id, interaction.token).callback.post({
-                data: {
-                    type: 4,
-                    data: {
-                        content: "Hello, World!"
-                    }
-                }
-            });
-        }
-    });
-    */
-
-
-    /*
-    client.application.commands.permissions.set({
-        guild: guildId,
-        command: commandId,
-        permissions: [
-            {
-                id: roleId,
-                type: 1,
-                permission: true
-            }
-        ]
-    });
-    */
-    //client.api.applications(client.user.id).commands("878790646855499796").delete(); 
-    /*
-    client.api.applications(client.user.id).commands.get().then((result) => {
-        //console.log(result);
-        var a = result;
-        var index, len;
-        for (index = 0, len = a.length; index < len; ++index) {
-            console.log(a[index]['name'],a[index]['id']);
-        }
-    });
-    */
-
-
-    /*работало
-    client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
-        console.log(interaction);
-        if (interaction.commandName === 'hello') {
-            await interaction.reply({ content: 'Pong!', ephemeral: true });
-        }
-    });
-    */
-
-});
-
-
-
 //Заготовка для Embed сообщения (обычное)
 function EmbMsg(title, color, descr){
     let embed = new MessageEmbed()
@@ -335,8 +56,6 @@ function MsgLink(link,linkdesc){
         );
     return linkButton;
 }
-
-
 
 //Список команд
 function funCommands(authorRole, command, typeMsg){
@@ -384,18 +103,130 @@ function funCommands(authorRole, command, typeMsg){
 }
 
 //ВК
-function funVk(typeMsg){
-    //Текстовый чат
-    if (typeMsg == 0) {
-        return EmbMsg(':thumbsup: Группа клана', 0x2B71FF, `\nВступайте в нашу группу в социальной сети ВКонтакте:\n[Наша группа в ВК](https://vk.com/wf_rsd)`);
-    }
-    //slash команда
-    if (typeMsg == 1) {
-        return EmbMsg(':thumbsup: Группа клана', 0x2B71FF, `\nВступайте в нашу группу в социальной сети ВКонтакте:\n[Наша группа в ВК](https://vk.com/wf_rsd)`);
+function funVk(){
+    return EmbMsg(':thumbsup: Группа клана', 0x2B71FF, `\nВступайте в нашу группу в социальной сети ВКонтакте:\n[Наша группа в ВК](https://vk.com/wf_rsd)`);
+}
+
+//Монетка
+function funMonetka(){
+    //Вычисляем случайное число от 1 до 3
+    var random = Math.floor(Math.random() * 3) + 1;
+    if (random === 1) {
+        //Если число = 1, то выпадает орёл.
+        return ':full_moon: Орёл!';
+    } else if (random === 2) { 
+        //Если число = 2, то выпадает решка.
+        return ':new_moon: Решка!';
+    } else if (random === 3) { 
+        //Если число = 3, то монета падает ребром.
+        return ':last_quarter_moon: Монета упала ребром!';
     }
 }
 
-/* Обработка сообщений */
+
+
+/* Вывод сообщения о работе и готовности бота */
+client.on('ready', () => {
+    // Если всё хорошо, то выводим статус ему + в консоль информаию
+    client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
+    console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
+    //Получаем id владельца сервера
+    const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
+
+    //----------------------------------------
+    //Регистрация slash-команд
+    //----------------------------------------
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'команды',
+        description: 'Отобразить список всех доступных команд бота'
+        },
+    });
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'вк',
+        description: 'Получить ссылку на группу клана в VK'
+        },
+    });
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'монетка',
+        description: 'Выдаёт случайный результат подброса монетки'
+        },
+    });
+
+    //----------------------------------------
+    //Обработка slash-команд
+    //----------------------------------------
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+        
+        //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
+        function hasRoleId(mem){
+            var idRepl = idAdmMod.replace(/ +/g, ' ');
+            var idSplit = idRepl.split(' ');
+            var result = false;
+            //Перебираем ID в переменной
+            idSplit.forEach(function(idSplit) {
+                if (idSplit != '') {
+                    //Проверяем длинну ID
+                    if (idSplit.length === 18) {
+                        //Проверка указанного id сервера
+                        if (idSrv !== '' || idSrv.length === 18) {
+                            //Проверка роли
+                            var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
+                            //Находим среди пользователей с ролью автора сообщения
+                            if (members.indexOf(mem.id) != -1) {
+                                result = true;
+                            }
+                        }
+                    }
+                }
+            });
+            //Выводим результат
+            return result;
+        }
+
+        //Команда - команды
+        if (interaction.commandName === 'команды') {
+            if (hasRoleId(interaction.user)) {
+                //Проверяем на права владельца сервера
+                if (interaction.user.id === ownerAdmID) {
+                    //Если есть права владельца
+                    await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
+                } else {
+                    //Если Администратор или Модератор
+                    await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
+                }
+            } else {
+                //Обычный пользователь
+                await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
+            }
+            //console.log("Admin: ",ownerAdmID);
+            //console.log("author id msg: ",interaction.user.id);
+        }
+
+        //Команда - вк
+        if (interaction.commandName === 'вк') {
+            await interaction.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
+        }
+        
+        //Команда - монетка
+        if (interaction.commandName === 'монетка') {
+            await interaction.reply({ content: funMonetka(), ephemeral: true });
+        }
+
+    });
+
+});
+
+
+
+
+
+//----------------------------------------
+//Обработка сообщений текстового канала
+//----------------------------------------
 client.on('messageCreate', message => {
     //Если это сам же бот, то игнорировать
     if (message.author.bot) return;
@@ -532,7 +363,7 @@ client.on('messageCreate', message => {
         }
         if(numArg === 1) {
             //Отправляем ссылку на группу
-            message.reply({ embeds: [funVk(0)], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')]});
+            message.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')]});
             return;
         }
         if(numArg > 2) {
@@ -611,18 +442,7 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nВыдаёт случайный результат подброса монетки.\n\nВарианты:\nОрёл, решка или упала на ребро.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/zaQC0LS.gif')]});
             return;
         }
-        //Вычисляем случайное число от 1 до 3
-        var random = Math.floor(Math.random() * 4) + 1;
-        if (random === 1) {
-            //Если число = 1, то выпадает орёл.
-            message.reply({ content: ':full_moon: Орёл!', allowedMentions: { repliedUser: false }});
-        } else if (random === 2) { 
-            //Если число = 2, то выпадает решка.
-            message.reply({ content: ':new_moon: Решка!', allowedMentions: { repliedUser: false }});
-        } else if (random === 3) { 
-            //Если число = 3, то монета падает ребром.
-            message.reply({ content: ':last_quarter_moon: Монета упала ребром!', allowedMentions: { repliedUser: false }});
-        }
+        message.reply({ content: funMonetka(), allowedMentions: { repliedUser: false }});
     }
 
     /* Подбросить монетку */
