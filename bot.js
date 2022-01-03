@@ -45,6 +45,16 @@ function EmbMsgHelp(title, color, descr, img){
     return embed;
 }
 
+//Заготовка для Embed сообщения
+function EmbedMsg(color, Descr){
+    let embed = new MessageEmbed()
+    .setColor(color)
+    .setDescription(Descr)
+    .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
+    .setTimestamp()
+    return embed;
+}
+
 //Заготовка для Кнопки-ссылки
 function MsgLink(link,linkdesc){
     let linkButton = new MessageActionRow()
@@ -57,6 +67,33 @@ function MsgLink(link,linkdesc){
     return linkButton;
 }
 
+//Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
+function hasRoleId(mem){
+    var idRepl = idAdmMod.replace(/ +/g, ' ');
+    var idSplit = idRepl.split(' ');
+    var result = false;
+    //Перебираем ID в переменной
+    idSplit.forEach(function(idSplit) {
+        if (idSplit != '') {
+            //Проверяем длинну ID
+            if (idSplit.length === 18) {
+                //Проверка указанного id сервера
+                if (idSrv !== '' || idSrv.length === 18) {
+                    //Проверка роли
+                    var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
+                    //Находим среди пользователей с ролью автора сообщения
+                    if (members.indexOf(mem.id) != -1) {
+                        result = true;
+                    }
+                }
+            }
+        }
+    });
+    //Выводим результат
+    return result;
+}
+
+//----------------------------------------
 //Список команд
 function funCommands(authorRole, command, typeMsg){
     //authorRole = 0-Владелец сервера, 1-Админы и модераторы (из idAdmMod), 2-Прочие пользователи
@@ -72,7 +109,7 @@ function funCommands(authorRole, command, typeMsg){
         //slash команда
         if (typeMsg == 1) {
             //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}rs\`** перезагрузить бота\n**\`${prefixSlash}ping\`** узнать время генерации сообщения\n**\`${prefixSlash}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды владельца`);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды владельца\nБудут добавлены позже...`);
         }
     }
     //Команды админов и модераторов (из idAdmMod)
@@ -85,7 +122,7 @@ function funCommands(authorRole, command, typeMsg){
         //slash команда
         if (typeMsg == 1) {
             //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды админа и модератора`);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды админа и модератора\nБудут добавлены позже...`);
         }
     }
     //Команды прочие пользователи
@@ -97,7 +134,7 @@ function funCommands(authorRole, command, typeMsg){
         //slash команда
         if (typeMsg == 1) {
             //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды пользователя`);
+            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды пользователя\nБудут добавлены позже...`);
         }
     }
 }
@@ -123,9 +160,54 @@ function funMonetka(){
     }
 }
 
+//О боте
+function funAboutBot(){
+    //id Автора бота
+    const autorID = '307427459450798080';
+    const infoSrv = client.guilds.cache;
+    //Кол-во пользователей
+    const memCount = infoSrv.map(guild => guild.memberCount).join("\n");
+    //Получаем содержимое package.json
+    let json = require(__dirname + '/package.json');
+    function msToTime(millis) {
+        var weeks, days, hours, minutes, seconds, total_hours, total_minutes, total_seconds;
+        var totalT = '';
+        total_seconds = parseInt(Math.floor(millis / 1000));
+        total_minutes = parseInt(Math.floor(total_seconds / 60));
+        total_hours = parseInt(Math.floor(total_minutes / 60));
+        seconds = parseInt(total_seconds % 60);
+        minutes = parseInt(total_minutes % 60);
+        hours = parseInt(total_hours % 24);
+        days = parseInt(Math.floor(total_hours / 24));
+        weeks = parseInt(Math.floor(days / 7));
+        if (weeks > 0) {
+            totalT += weeks + "нед ";
+        }
+        if (days > 0) {
+            totalT += days + "д ";
+        }
+        if (hours > 0) {
+            totalT += hours + "ч ";
+        }
+        if (minutes > 0) {
+            totalT += minutes + "м ";
+        }
+        if (seconds > 0) {
+            totalT += seconds + "с";
+        }
+        return totalT;
+    }
+    var timeOnline = Date.now()-startBot;
+
+    return EmbMsg(':robot: О БОТЕ', 0x82E9FF, `\n**Версия бота: **${json.version}\n**Автор бота:** <@${autorID}>\n\n**Работает в сети:**\n${msToTime(timeOnline)}\n\n**Пользователей на сервере: **${memCount}`);
+}
 
 
-/* Вывод сообщения о работе и готовности бота */
+
+
+//----------------------------------------
+//Вывод сообщения о работе и готовности бота
+//----------------------------------------
 client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
     client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
@@ -154,39 +236,18 @@ client.on('ready', () => {
         description: 'Выдаёт случайный результат подброса монетки'
         },
     });
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'бот',
+        description: 'Получить информацию о данном боте'
+        },
+    });
 
     //----------------------------------------
     //Обработка slash-команд
     //----------------------------------------
     client.on('interactionCreate', async interaction => {
         if (!interaction.isCommand()) return;
-        
-        //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
-        function hasRoleId(mem){
-            var idRepl = idAdmMod.replace(/ +/g, ' ');
-            var idSplit = idRepl.split(' ');
-            var result = false;
-            //Перебираем ID в переменной
-            idSplit.forEach(function(idSplit) {
-                if (idSplit != '') {
-                    //Проверяем длинну ID
-                    if (idSplit.length === 18) {
-                        //Проверка указанного id сервера
-                        if (idSrv !== '' || idSrv.length === 18) {
-                            //Проверка роли
-                            var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
-                            //Находим среди пользователей с ролью автора сообщения
-                            if (members.indexOf(mem.id) != -1) {
-                                result = true;
-                            }
-                        }
-                    }
-                }
-            });
-            //Выводим результат
-            return result;
-        }
-
         //Команда - команды
         if (interaction.commandName === 'команды') {
             if (hasRoleId(interaction.user)) {
@@ -216,6 +277,10 @@ client.on('ready', () => {
             await interaction.reply({ content: funMonetka(), ephemeral: true });
         }
 
+        //Команда - бот
+        if (interaction.commandName === 'бот') {
+            await interaction.reply({ embeds: [funAboutBot()], ephemeral: true });
+        }
     });
 
 });
@@ -246,32 +311,6 @@ client.on('messageCreate', message => {
         if (message.channel.type === 'GUILD_TEXT'){
             return false;
         }
-    }
-
-    //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
-    function hasRoleId(mem){
-        var idRepl = idAdmMod.replace(/ +/g, ' ');
-        var idSplit = idRepl.split(' ');
-        var result = false;
-        //Перебираем ID в переменной
-        idSplit.forEach(function(idSplit) {
-            if (idSplit != '') {
-                //Проверяем длинну ID
-                if (idSplit.length === 18) {
-                    //Проверка указанного id сервера
-                    if (idSrv !== '' || idSrv.length === 18) {
-                        //Проверка роли
-                        var members = client.guilds.cache.get(idSrv).roles.cache.find(role => role.id === idSplit).members.map(m=>m.user.id);
-                        //Находим среди пользователей с ролью автора сообщения
-                        if (members.indexOf(mem.id) != -1) {
-                            result = true;
-                        }
-                    }
-                }
-            }
-        });
-        //Выводим результат
-        return result;
     }
 
     //Проверка на JSON
@@ -453,43 +492,8 @@ client.on('messageCreate', message => {
             return;
         }
         if(numArg === 1) {
-            //id Автора бота
-            const autorID = '307427459450798080';
-            const infoSrv = client.guilds.cache;
-            //Кол-во пользователей
-            const memCount = infoSrv.map(guild => guild.memberCount).join("\n");
-            //Получаем содержимое package.json
-            let json = require(__dirname + '/package.json');
-            function msToTime(millis) {
-                var weeks, days, hours, minutes, seconds, total_hours, total_minutes, total_seconds;
-                var totalT = '';
-                total_seconds = parseInt(Math.floor(millis / 1000));
-                total_minutes = parseInt(Math.floor(total_seconds / 60));
-                total_hours = parseInt(Math.floor(total_minutes / 60));
-                seconds = parseInt(total_seconds % 60);
-                minutes = parseInt(total_minutes % 60);
-                hours = parseInt(total_hours % 24);
-                days = parseInt(Math.floor(total_hours / 24));
-                weeks = parseInt(Math.floor(days / 7));
-                if (weeks > 0) {
-                    totalT += weeks + "нед ";
-                }
-                if (days > 0) {
-                    totalT += days + "д ";
-                }
-                if (hours > 0) {
-                    totalT += hours + "ч ";
-                }
-                if (minutes > 0) {
-                    totalT += minutes + "м ";
-                }
-                if (seconds > 0) {
-                    totalT += seconds + "с";
-                }
-                return totalT;
-            }
-            var timeOnline = Date.now()-startBot;
-            message.reply({ embeds: [EmbMsg(':robot: О БОТЕ', 0x82E9FF, `\n**Версия бота: **${json.version}\n**Автор бота:** <@${autorID}>\n\n**Работает в сети:**\n${msToTime(timeOnline)}\n\n**Пользователей на сервере: **${memCount}`)]});
+            //Отправляем информацию о боте
+            message.reply({ embeds: [funAboutBot()]});
         }
         if(numArg > 2) {
             //Выдаём справку по данной команде
@@ -1218,15 +1222,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     } else {
         srvNick = oldMember.nickname;
     }
-    //Заготовка для Embed сообщения
-    function EmbedMsg(color, Descr){
-        let embed = new MessageEmbed()
-        .setColor(color)
-        .setDescription(Descr)
-        .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
-        .setTimestamp()
-        return embed;
-    }
+    
 
     //Пользователь подключился к голосовому каналу
     if(!oldState.channel && newState.channel) {
