@@ -1,4 +1,4 @@
-const { Client, Intents, MessageEmbed, MessageActionRow, MessageButton, CommandInteraction, Collection } = require('discord.js');
+const { Client, Intents, MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton, CommandInteraction, Collection } = require('discord.js');
 var request = require('request');
 //
 //Токен
@@ -45,7 +45,7 @@ function EmbMsgHelp(title, color, descr, img){
     return embed;
 }
 
-//Заготовка для Embed сообщения
+//Заготовка для Embed сообщения (информационные сообщения)
 function EmbedMsg(color, Descr){
     let embed = new MessageEmbed()
     .setColor(color)
@@ -65,6 +65,93 @@ function MsgLink(link,linkdesc){
         .setStyle('LINK')
         );
     return linkButton;
+}
+
+//Список для гороскопа
+function listForHoro(){
+    const row = new MessageActionRow()
+        .addComponents(
+            new MessageSelectMenu()
+                .setCustomId('selectHoro')
+                .setPlaceholder('Выберите знак задиака')
+                //.setMinValues(2)
+                //.setMaxValues(3)
+                .addOptions([
+                    {
+                        label: 'Овен',
+                        description: 'Прогноз для знака - Овен',
+                        value: 'aries',
+                        emoji: '♈',
+                    },
+                    {
+                        label: 'Телец',
+                        description: 'Прогноз для знака - Телец',
+                        value: 'taurus',
+                        emoji: '♉',
+                    },
+                    {
+                        label: 'Близнецы',
+                        description: 'Прогноз для знака - Близнецы',
+                        value: 'gemini',
+                        emoji: '♊',
+                    },
+                    {
+                        label: 'Рак',
+                        description: 'Прогноз для знака - Рак',
+                        value: 'cancer',
+                        emoji: '♋',
+                    },
+                    {
+                        label: 'Лев',
+                        description: 'Прогноз для знака - Лев',
+                        value: 'leo',
+                        emoji: '♌',
+                    },
+                    {
+                        label: 'Дева',
+                        description: 'Прогноз для знака - Дева',
+                        value: 'virgo',
+                        emoji: '♍',
+                    },
+                    {
+                        label: 'Весы',
+                        description: 'Прогноз для знака - Весы',
+                        value: 'libra',
+                        emoji: '♎',
+                    },
+                    {
+                        label: 'Скорпион',
+                        description: 'Прогноз для знака - Скорпион',
+                        value: 'scorpio',
+                        emoji: '♏',
+                    },
+                    {
+                        label: 'Стрелец',
+                        description: 'Прогноз для знака - Стрелец',
+                        value: 'sagittarius',
+                        emoji: '♐',
+                    },
+                    {
+                        label: 'Козерог',
+                        description: 'Прогноз для знака - Козерог',
+                        value: 'capricorn',
+                        emoji: '♑',
+                    },
+                    {
+                        label: 'Водолей',
+                        description: 'Прогноз для знака - Водолей',
+                        value: 'aquarius',
+                        emoji: '♒',
+                    },
+                    {
+                        label: 'Рыбы',
+                        description: 'Прогноз для знака - Рыбы',
+                        value: 'pisces',
+                        emoji: '♓',
+                    },
+                ]),
+        );
+    return row;
 }
 
 //Проверка ролей Администратора и Модераторов по ID из переменной (конфигурации)
@@ -91,6 +178,79 @@ function hasRoleId(mem){
     });
     //Выводим результат
     return result;
+}
+
+//Проверка на JSON
+function IsJsonString(str) {
+    str = typeof item !== "string"
+        ? JSON.stringify(str)
+        : str;
+    try {
+        str = JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    if (typeof str === "object" && str !== null) {
+        return true;
+    }
+    return false;
+}
+
+//парсинг данных с API
+function parseApi(info) {
+    //Класс в игре
+    function classGame(cl) {
+        //Проверяем
+        if (cl === false) {
+            return "-";
+        } else {
+            if (cl === "Rifleman")
+            {
+                return "Штурмовик";
+            }
+            if (cl === "Engineer")
+            {
+                return "Инженер";
+            }
+            if (cl === "Medic")
+            {
+                return "Медик";
+            }
+            if (cl === "Recon")
+            {
+                return "Снайпер";
+            }
+            if (cl === "Heavy")
+            {
+                return "СЭД";
+            }
+        }
+    }
+    var user = "";
+    //Ник в игре
+    user += "**Ник:**   ``" + info.nickname + "``\n";
+    //Клан
+    if (info.clan_name) {
+        user += "**Клан:**   ``" + info.clan_name + "``\n";
+    } else {
+        user += "**Клан:**   ``-``\n";
+    }
+    //Ранг
+    user += "**Ранг:**   ``" + info.rank_id + "``\n";
+    //Общее время матчей
+    user += "**Общее время матчей:**   ``" + info.playtime_h + "ч " + info.playtime_m + "м``\n";
+    //Любимый класс PvP
+    user += "**Любимый класс PvP:**   ``" + classGame(info.favoritPVP) + "``\n";
+    //Соотн. убийств/смертей:
+    user += "**Соотн. убийств/смертей:**   ``" + info.pvp + "``\n";
+    //Побед/Поражений
+    user += "**Побед/Поражений:**   ``" + info.pvp_wins + " / " + info.pvp_lost + "``\n";
+    //Любимый класс PvE
+    user += "**Любимый класс PvE:**   ``" + classGame(info.favoritPVE) + "``\n";
+    //Пройдено PvE
+    user += "**Пройдено PvE:**   ``" + info.pve_wins + "``";
+    //Выводим
+    return user;
 }
 
 //----------------------------------------
@@ -202,7 +362,93 @@ function funAboutBot(){
     return EmbMsg(':robot: О БОТЕ', 0x82E9FF, `\n**Версия бота: **${json.version}\n**Автор бота:** <@${autorID}>\n\n**Работает в сети:**\n${msToTime(timeOnline)}\n\n**Пользователей на сервере: **${memCount}`);
 }
 
-
+//Гороскоп
+function funHoro(znakZ){
+    //Название знака
+    var nameznak = "";
+    if (znakZ === 'aries') {
+        nameznak = "Овен";
+    }
+    if (znakZ === 'taurus') {
+        nameznak = "Телец";
+    }
+    if (znakZ === 'gemini') {
+        nameznak = "Близнецы";
+    }
+    if (znakZ === 'cancer') {
+        nameznak = "Рак";
+    }
+    if (znakZ === 'leo') {
+        nameznak = "Лев";
+    }
+    if (znakZ === 'virgo') {
+        nameznak = "Дева";
+    }
+    if (znakZ === 'libra') {
+        nameznak = "Весы";
+    }
+    if (znakZ === 'scorpio') {
+        nameznak = "Скорпион";
+    }
+    if (znakZ === 'sagittarius') {
+        nameznak = "Стрелец";
+    }
+    if (znakZ === 'capricorn') {
+        nameznak = "Козерог";
+    }
+    if (znakZ === 'aquarius') {
+        nameznak = "Водолей";
+    }
+    if (znakZ === 'pisces') {
+        nameznak = "Рыбы";
+    }
+    console.log(znakZ);
+    console.log(nameznak);
+    //Получаем сам гороскоп
+    let link = "https://horoscopes.rambler.ru/api/front/v1/horoscope/today/" + znakZ;
+    let urlEnc = encodeURI(link);
+    var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+    //Запрос
+    request(options, function(error, response, body){
+        //Если возникла ошибка
+        if (error) {
+            console.log('err get horo: ', error);
+            //{ embeds: [ ] }
+            return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`);
+        } else {
+            //Если есть ответ
+            if (response) {
+                //Если статус запроса 200
+                if (response.statusCode == 200) {
+                    if (IsJsonString(body) == true) {
+                        var regex = /(<([^>]+)>)/ig;
+                        var bodytext = body.text;
+                        var texthoro = bodytext.replace(regex, "");
+                        //Изменяем Embed сообщение
+                        console.log('200json');
+                        //console.log(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                        console.log('200json info', EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                        return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
+                    } else {
+                        //Ошибка - не JSON
+                        console.log('200nojson');
+                        return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла ошибка в данных.\nПопробуйте отправить команду позже.`);
+                    }
+                } else {
+                    //Неверный запрос || Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
+                    if (response.statusCode == 400 || response.statusCode == 403 || response.statusCode == 404 || response.statusCode == 500) {
+                        console.log('400-403-500');
+                        return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`);
+                    }
+                }
+            } else {
+                //Нет данных ответа сервера
+                console.log('anypizdec');
+                return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`);
+            }
+        }
+    });
+}
 
 
 //----------------------------------------
@@ -242,44 +488,86 @@ client.on('ready', () => {
         description: 'Получить информацию о данном боте'
         },
     });
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'гороскоп',
+        description: 'Позволяет получить гороскоп на сегодня по указанному знаку зодиака'
+        },
+    });
 
     //----------------------------------------
     //Обработка slash-команд
     //----------------------------------------
     client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
-        //Команда - команды
-        if (interaction.commandName === 'команды') {
-            if (hasRoleId(interaction.user)) {
-                //Проверяем на права владельца сервера
-                if (interaction.user.id === ownerAdmID) {
-                    //Если есть права владельца
-                    await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
+        //Обратотка команды
+        if (interaction.isCommand()) {
+            //Команда - команды
+            if (interaction.commandName === 'команды') {
+                if (hasRoleId(interaction.user)) {
+                    //Проверяем на права владельца сервера
+                    if (interaction.user.id === ownerAdmID) {
+                        //Если есть права владельца
+                        await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
+                    } else {
+                        //Если Администратор или Модератор
+                        await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
+                    }
                 } else {
-                    //Если Администратор или Модератор
-                    await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
+                    //Обычный пользователь
+                    await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
                 }
-            } else {
-                //Обычный пользователь
-                await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
+                //console.log("Admin: ",ownerAdmID);
+                //console.log("author id msg: ",interaction.user.id);
             }
-            //console.log("Admin: ",ownerAdmID);
-            //console.log("author id msg: ",interaction.user.id);
+
+            //Команда - вк
+            if (interaction.commandName === 'вк') {
+                await interaction.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
+            }
+            
+            //Команда - монетка
+            if (interaction.commandName === 'монетка') {
+                await interaction.reply({ content: funMonetka(), ephemeral: true });
+            }
+
+            //Команда - бот
+            if (interaction.commandName === 'бот') {
+                await interaction.reply({ embeds: [funAboutBot()], ephemeral: true });
+            }
+
+            //Команда - гороскоп
+            if (interaction.commandName === 'гороскоп') {
+                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак задиака', embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `...`)], ephemeral: true, components: [listForHoro()] }).then(() => {
+                    setTimeout(async () => {
+                        await interaction.editReply({ content: 'Вами не было выбрано в течении 20 секунд знака задиака', components: [], embeds: [], ephemeral: true });
+                        //await interaction.editReply({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Вами не было выбрано в течении 20 секунд знака задиака`)], components: []});
+                    }, 20000);
+                });
+
+            }
         }
 
-        //Команда - вк
-        if (interaction.commandName === 'вк') {
-            await interaction.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
-        }
-        
-        //Команда - монетка
-        if (interaction.commandName === 'монетка') {
-            await interaction.reply({ content: funMonetka(), ephemeral: true });
-        }
+        //Обработка выбора выпадающего списка
+        if (interaction.isSelectMenu()) {
+            if (interaction.customId === 'selectHoro') {
+                console.log("знак: ", interaction.values[0]);
+                var emHoro = funHoro(interaction.values[0]);
+                console.log('isSelectMenu - emHoro', emHoro);
+                //await interaction.deferReply();
+                // Do some stuff that takes time right here...
+                //interaction.editReply({ content: "replied" });
 
-        //Команда - бот
-        if (interaction.commandName === 'бот') {
-            await interaction.reply({ embeds: [funAboutBot()], ephemeral: true });
+                //ниже работало
+                //await interaction.update({ embeds: [emHoro], components: [], ephemeral: true });
+
+
+
+                //await interaction.update({ embeds: [funHoro(interaction.values[0])], components: [] });
+                //console.log(interaction.values[0]);funHoro(znakZ)
+            }
+
+            //await interaction.deferUpdate();
+            //interaction.reply({ content: `Выбран знак ${interaction.value[0]}`, ephemeral: true });
         }
     });
 
@@ -311,22 +599,6 @@ client.on('messageCreate', message => {
         if (message.channel.type === 'GUILD_TEXT'){
             return false;
         }
-    }
-
-    //Проверка на JSON
-    function IsJsonString(str) {
-        str = typeof item !== "string"
-            ? JSON.stringify(str)
-            : str;
-        try {
-            str = JSON.parse(str);
-        } catch (e) {
-            return false;
-        }
-        if (typeof str === "object" && str !== null) {
-            return true;
-        }
-        return false;
     }
 
     //Удаление из текстого канала ссылок-приглашений
@@ -565,8 +837,6 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет выгнать (кикнуть) пользователя с сервера.\n\nУказываем пользователя через знак @\nЧерез пробел можно указать причину кика с сервера.\n\n**Пример набора команды**\n\`\`\`${prefix}${command} @пользователь причина\`\`\``, 'https://i.imgur.com/87RRitG.gif')]});
             return;
         }
-        //Название сервера
-        //const nameSrv = client.guilds.cache.map(guild => guild.name).join("\n");
         //Проверяем куда была отправленна данная команда
         if (privateMsg() == false){
             //публично
@@ -608,7 +878,6 @@ client.on('messageCreate', message => {
                     reas = "Увы, не указана причина кика";
                 }
                 //Отправляем пользователю, которого кикнули, сообщение
-                //user.send(">>> Тебя кикнули с сервера **" + nameSrv + "**\nПричина: " + reas);
                 user.send({ content: ">>> Тебя кикнули с сервера **" + nameSrv + "**\nПричина: **" + reas + "**"});
                 //Кикаем пользователя с сервера
                 user.kick(reas);
@@ -704,62 +973,7 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца\`\`\``, 'https://i.imgur.com/7gHBgNN.gif')]});
             return;
         }
-        //парсинг данных с API
-        function parseApi(info) {
-            //Класс в игре
-            function classGame(cl) {
-                //Проверяем
-                if (cl === false) {
-                    return "-";
-                } else {
-                    if (cl === "Rifleman")
-                    {
-                        return "Штурмовик";
-                    }
-                    if (cl === "Engineer")
-                    {
-                        return "Инженер";
-                    }
-                    if (cl === "Medic")
-                    {
-                        return "Медик";
-                    }
-                    if (cl === "Recon")
-                    {
-                        return "Снайпер";
-                    }
-                    if (cl === "Heavy")
-                    {
-                        return "СЭД";
-                    }
-                }
-            }
-            var user = "";
-            //Ник в игре
-            user += "**Ник:**   ``" + info.nickname + "``\n";
-            //Клан
-            if (info.clan_name) {
-                user += "**Клан:**   ``" + info.clan_name + "``\n";
-            } else {
-                user += "**Клан:**   ``-``\n";
-            }
-            //Ранг
-            user += "**Ранг:**   ``" + info.rank_id + "``\n";
-            //Общее время матчей
-            user += "**Общее время матчей:**   ``" + info.playtime_h + "ч " + info.playtime_m + "м``\n";
-            //Любимый класс PvP
-            user += "**Любимый класс PvP:**   ``" + classGame(info.favoritPVP) + "``\n";
-            //Соотн. убийств/смертей:
-            user += "**Соотн. убийств/смертей:**   ``" + info.pvp + "``\n";
-            //Побед/Поражений
-            user += "**Побед/Поражений:**   ``" + info.pvp_wins + " / " + info.pvp_lost + "``\n";
-            //Любимый класс PvE
-            user += "**Любимый класс PvE:**   ``" + classGame(info.favoritPVE) + "``\n";
-            //Пройдено PvE
-            user += "**Пройдено PvE:**   ``" + info.pve_wins + "``";
-            //Выводим
-            return user;
-        }
+        
 
         //Если указали только название команды
         if(numArg === 1 || numArg > 2) {
