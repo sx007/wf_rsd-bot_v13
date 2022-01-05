@@ -363,7 +363,7 @@ function funAboutBot(){
 }
 
 //Гороскоп
-function funHoro(znakZ){
+function funHoro(znakZ, tMsg){
     //Название знака
     var nameznak = "";
     if (znakZ === 'aries') {
@@ -427,8 +427,19 @@ function funHoro(znakZ){
                         //Изменяем Embed сообщение
                         console.log('200json');
                         //console.log(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
-                        console.log('200json info', EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
-                        return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
+                        //console.log('200json info', EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                        
+                        //Обычное сообщение
+                        if (tMsg == 0) {
+                            return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
+                        }
+
+                        //Если Slash команда
+                        if (tMsg == 1) {
+                            interaction.update({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`)], components: [], ephemeral: true });
+                        }
+                        
+                        //return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
                     } else {
                         //Ошибка - не JSON
                         console.log('200nojson');
@@ -537,9 +548,9 @@ client.on('ready', () => {
 
             //Команда - гороскоп
             if (interaction.commandName === 'гороскоп') {
-                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак задиака', embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `...`)], ephemeral: true, components: [listForHoro()] }).then(() => {
+                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак задиака', ephemeral: true, components: [listForHoro()] }).then(() => {
                     setTimeout(async () => {
-                        await interaction.editReply({ content: 'Вами не было выбрано в течении 20 секунд знака задиака', components: [], embeds: [], ephemeral: true });
+                        await interaction.editReply({ content: 'Вами не было выбрано в течении 20 секунд знака задиака', components: [], ephemeral: true });
                         //await interaction.editReply({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Вами не было выбрано в течении 20 секунд знака задиака`)], components: []});
                     }, 20000);
                 });
@@ -551,14 +562,15 @@ client.on('ready', () => {
         if (interaction.isSelectMenu()) {
             if (interaction.customId === 'selectHoro') {
                 console.log("знак: ", interaction.values[0]);
-                var emHoro = funHoro(interaction.values[0]);
-                console.log('isSelectMenu - emHoro', emHoro);
+                //funHoro(interaction.values[0], 1);
+                
+                
                 //await interaction.deferReply();
                 // Do some stuff that takes time right here...
                 //interaction.editReply({ content: "replied" });
 
                 //ниже работало
-                //await interaction.update({ embeds: [emHoro], components: [], ephemeral: true });
+                await interaction.update({ content: "Функционал не доделан", embeds: [], components: [], ephemeral: true });
 
 
 
