@@ -68,11 +68,11 @@ function MsgLink(link,linkdesc){
 }
 
 //Список для гороскопа
-function listForHoro(){
+function listForHoro(CustId){
     const row = new MessageActionRow()
         .addComponents(
             new MessageSelectMenu()
-                .setCustomId('selectHoro')
+                .setCustomId(CustId)
                 .setPlaceholder('Выберите знак задиака')
                 //.setMinValues(2)
                 //.setMaxValues(3)
@@ -538,16 +538,13 @@ client.on('ready', () => {
 
             //Команда - гороскоп
             if (interaction.commandName === 'гороскоп') {
-                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак зодиака', ephemeral: true, components: [listForHoro()] });
+                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак зодиака', ephemeral: true, components: [listForHoro('selectHoro')] });
             }
         }
 
         //Обработка выбора выпадающего списка
         if (interaction.isSelectMenu()) {
             if (interaction.customId === 'selectHoro') {
-                //ниже работало
-                //await interaction.update({ content: "Функционал не доделан", embeds: [], components: [], ephemeral: true });
-
                 let embHoro = await funHoro(interaction.values[0], 0);                
                 await interaction.update({ content: null, embeds: [embHoro], components: [], ephemeral: true });
             }
