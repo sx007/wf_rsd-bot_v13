@@ -363,101 +363,91 @@ function funAboutBot(){
 }
 
 //Гороскоп
-function funHoro(znakZ, tMsg){
-    //Название знака
-    var nameznak = "";
-    if (znakZ === 'aries') {
-        nameznak = "Овен";
-    }
-    if (znakZ === 'taurus') {
-        nameznak = "Телец";
-    }
-    if (znakZ === 'gemini') {
-        nameznak = "Близнецы";
-    }
-    if (znakZ === 'cancer') {
-        nameznak = "Рак";
-    }
-    if (znakZ === 'leo') {
-        nameznak = "Лев";
-    }
-    if (znakZ === 'virgo') {
-        nameznak = "Дева";
-    }
-    if (znakZ === 'libra') {
-        nameznak = "Весы";
-    }
-    if (znakZ === 'scorpio') {
-        nameznak = "Скорпион";
-    }
-    if (znakZ === 'sagittarius') {
-        nameznak = "Стрелец";
-    }
-    if (znakZ === 'capricorn') {
-        nameznak = "Козерог";
-    }
-    if (znakZ === 'aquarius') {
-        nameznak = "Водолей";
-    }
-    if (znakZ === 'pisces') {
-        nameznak = "Рыбы";
-    }
-    console.log(znakZ);
-    console.log(nameznak);
-    //Получаем сам гороскоп
-    let link = "https://horoscopes.rambler.ru/api/front/v1/horoscope/today/" + znakZ;
-    let urlEnc = encodeURI(link);
-    var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
-    //Запрос
-    request(options, function(error, response, body){
-        //Если возникла ошибка
-        if (error) {
-            console.log('err get horo: ', error);
-            //{ embeds: [ ] }
-            return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`);
-        } else {
-            //Если есть ответ
-            if (response) {
-                //Если статус запроса 200
-                if (response.statusCode == 200) {
-                    if (IsJsonString(body) == true) {
-                        var regex = /(<([^>]+)>)/ig;
-                        var bodytext = body.text;
-                        var texthoro = bodytext.replace(regex, "");
-                        //Изменяем Embed сообщение
-                        console.log('200json');
-                        //console.log(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
-                        //console.log('200json info', EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
-                        
-                        //Обычное сообщение
-                        if (tMsg == 0) {
-                            return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
-                        }
+async function funHoro(znakZ, tMsg){
+    return new Promise(function(resolve) {
+        //Название знака
+        var nameznak = "";
+        if (znakZ === 'aries') {
+            nameznak = "Овен";
+        }
+        if (znakZ === 'taurus') {
+            nameznak = "Телец";
+        }
+        if (znakZ === 'gemini') {
+            nameznak = "Близнецы";
+        }
+        if (znakZ === 'cancer') {
+            nameznak = "Рак";
+        }
+        if (znakZ === 'leo') {
+            nameznak = "Лев";
+        }
+        if (znakZ === 'virgo') {
+            nameznak = "Дева";
+        }
+        if (znakZ === 'libra') {
+            nameznak = "Весы";
+        }
+        if (znakZ === 'scorpio') {
+            nameznak = "Скорпион";
+        }
+        if (znakZ === 'sagittarius') {
+            nameznak = "Стрелец";
+        }
+        if (znakZ === 'capricorn') {
+            nameznak = "Козерог";
+        }
+        if (znakZ === 'aquarius') {
+            nameznak = "Водолей";
+        }
+        if (znakZ === 'pisces') {
+            nameznak = "Рыбы";
+        }
 
-                        //Если Slash команда
-                        if (tMsg == 1) {
-                            interaction.update({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`)], components: [], ephemeral: true });
+        //Получаем сам гороскоп
+        let link = "https://horoscopes.rambler.ru/api/front/v1/horoscope/today/" + znakZ;
+        let urlEnc = encodeURI(link);
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+        //Запрос
+        request(options, function(error, response, body){
+            //Если возникла ошибка
+            if (error) {
+                console.log('err get horo: ', error);
+                resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`));
+            } else {
+                //Если есть ответ
+                if (response) {
+                    //Если статус запроса 200
+                    if (response.statusCode == 200) {
+                        if (IsJsonString(body) == true) {
+                            var regex = /(<([^>]+)>)/ig;
+                            var bodytext = body.text;
+                            var texthoro = bodytext.replace(regex, "");
+                            //Обычное сообщение
+                            if (tMsg == 0) {
+                                resolve(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                            }
+
+                            //Если Slash команда
+                            if (tMsg == 1) {
+                                resolve(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                            }
+                        } else {
+                            //Ошибка - не JSON
+                            resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла ошибка в данных.\nПопробуйте отправить команду позже.`));
                         }
-                        
-                        //return EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`);
                     } else {
-                        //Ошибка - не JSON
-                        console.log('200nojson');
-                        return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла ошибка в данных.\nПопробуйте отправить команду позже.`);
+                        //Неверный запрос || Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
+                        if (response.statusCode == 400 || response.statusCode == 403 || response.statusCode == 404 || response.statusCode == 500) {
+                            resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`));
+                        }
                     }
                 } else {
-                    //Неверный запрос || Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
-                    if (response.statusCode == 400 || response.statusCode == 403 || response.statusCode == 404 || response.statusCode == 500) {
-                        console.log('400-403-500');
-                        return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`);
-                    }
+                    //Нет данных ответа сервера
+                    resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`));
                 }
-            } else {
-                //Нет данных ответа сервера
-                console.log('anypizdec');
-                return EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`);
             }
-        }
+        });
     });
 }
 
@@ -548,38 +538,19 @@ client.on('ready', () => {
 
             //Команда - гороскоп
             if (interaction.commandName === 'гороскоп') {
-                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак задиака', ephemeral: true, components: [listForHoro()] }).then(() => {
-                    setTimeout(async () => {
-                        await interaction.editReply({ content: 'Вами не было выбрано в течении 20 секунд знака задиака', components: [], ephemeral: true });
-                        //await interaction.editReply({ embeds: [EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Вами не было выбрано в течении 20 секунд знака задиака`)], components: []});
-                    }, 20000);
-                });
-
+                await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак зодиака', ephemeral: true, components: [listForHoro()] });
             }
         }
 
         //Обработка выбора выпадающего списка
         if (interaction.isSelectMenu()) {
             if (interaction.customId === 'selectHoro') {
-                console.log("знак: ", interaction.values[0]);
-                //funHoro(interaction.values[0], 1);
-                
-                
-                //await interaction.deferReply();
-                // Do some stuff that takes time right here...
-                //interaction.editReply({ content: "replied" });
-
                 //ниже работало
-                await interaction.update({ content: "Функционал не доделан", embeds: [], components: [], ephemeral: true });
+                //await interaction.update({ content: "Функционал не доделан", embeds: [], components: [], ephemeral: true });
 
-
-
-                //await interaction.update({ embeds: [funHoro(interaction.values[0])], components: [] });
-                //console.log(interaction.values[0]);funHoro(znakZ)
+                let embHoro = await funHoro(interaction.values[0], 0);                
+                await interaction.update({ content: null, embeds: [embHoro], components: [], ephemeral: true });
             }
-
-            //await interaction.deferUpdate();
-            //interaction.reply({ content: `Выбран знак ${interaction.value[0]}`, ephemeral: true });
         }
     });
 
