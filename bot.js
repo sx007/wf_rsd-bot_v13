@@ -1,6 +1,5 @@
 const { Client, Intents, MessageEmbed, MessageActionRow, MessageSelectMenu, MessageButton, CommandInteraction, Collection } = require('discord.js');
 var request = require('request');
-//
 //Токен
 const token = process.env.BOT_TOKEN;
 //Префикс для команд
@@ -28,7 +27,7 @@ function EmbMsg(title, color, descr){
     .setTitle(title)
     .setColor(color)
     .setDescription(descr)
-    .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
+    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -40,7 +39,7 @@ function EmbMsgHelp(title, color, descr, img){
     .setColor(color)
     .setDescription(descr)
     .setImage(img)
-    .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
+    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -50,7 +49,7 @@ function EmbedMsg(color, Descr){
     let embed = new MessageEmbed()
     .setColor(color)
     .setDescription(Descr)
-    .setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
+    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -73,9 +72,7 @@ function listForHoro(CustId){
         .addComponents(
             new MessageSelectMenu()
                 .setCustomId(CustId)
-                .setPlaceholder('Выберите знак задиака')
-                //.setMinValues(2)
-                //.setMaxValues(3)
+                .setPlaceholder('Выберите знак зодиака')
                 .addOptions([
                     {
                         label: 'Овен',
@@ -255,7 +252,7 @@ function parseApi(info) {
 
 //----------------------------------------
 //Список команд
-function funCommands(authorRole, command, typeMsg){
+function funcCommands(authorRole, command, typeMsg){
     //authorRole = 0-Владелец сервера, 1-Админы и модераторы (из idAdmMod), 2-Прочие пользователи
     //command = название команды из чата
     //typeMsg = 0-Текстовый чат, 1-slash команда
@@ -300,12 +297,12 @@ function funCommands(authorRole, command, typeMsg){
 }
 
 //ВК
-function funVk(){
+function funcVk(){
     return EmbMsg(':thumbsup: Группа клана', 0x2B71FF, `\nВступайте в нашу группу в социальной сети ВКонтакте:\n[Наша группа в ВК](https://vk.com/wf_rsd)`);
 }
 
 //Монетка
-function funMonetka(){
+function funcMonetka(){
     //Вычисляем случайное число от 1 до 3
     var random = Math.floor(Math.random() * 3) + 1;
     if (random === 1) {
@@ -321,7 +318,7 @@ function funMonetka(){
 }
 
 //О боте
-function funAboutBot(){
+function funcAboutBot(){
     //id Автора бота
     const autorID = '307427459450798080';
     const infoSrv = client.guilds.cache;
@@ -363,7 +360,7 @@ function funAboutBot(){
 }
 
 //Гороскоп
-async function funHoro(znakZ, tMsg){
+async function funcHoro(znakZ, tMsg){
     return new Promise(function(resolve) {
         //Название знака
         var nameznak = "";
@@ -463,6 +460,16 @@ client.on('ready', () => {
     const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
 
     //----------------------------------------
+    //Удаляем все ранее зарегистрированные slash-команды
+    //----------------------------------------
+    client.api.applications(client.user.id).commands.get().then((result) => {
+        var a = result;
+        var index, len;
+        for (index = 0, len = a.length; index < len; ++index) {
+            client.api.applications(client.user.id).commands(a[index]['id']).delete();
+        }
+    });
+    //----------------------------------------
     //Регистрация slash-команд
     //----------------------------------------
     client.api.applications(client.user.id).commands.post({
@@ -508,32 +515,30 @@ client.on('ready', () => {
                     //Проверяем на права владельца сервера
                     if (interaction.user.id === ownerAdmID) {
                         //Если есть права владельца
-                        await interaction.reply({ embeds: [funCommands(0,'команды',1)], ephemeral: true });
+                        await interaction.reply({ embeds: [funcCommands(0,'команды',1)], ephemeral: true });
                     } else {
                         //Если Администратор или Модератор
-                        await interaction.reply({ embeds: [funCommands(1,'команды',1)], ephemeral: true });
+                        await interaction.reply({ embeds: [funcCommands(1,'команды',1)], ephemeral: true });
                     }
                 } else {
                     //Обычный пользователь
-                    await interaction.reply({ embeds: [funCommands(2,'команды',1)], ephemeral: true });
+                    await interaction.reply({ embeds: [funcCommands(2,'команды',1)], ephemeral: true });
                 }
-                //console.log("Admin: ",ownerAdmID);
-                //console.log("author id msg: ",interaction.user.id);
             }
 
             //Команда - вк
             if (interaction.commandName === 'вк') {
-                await interaction.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
+                await interaction.reply({ embeds: [funcVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
             }
             
             //Команда - монетка
             if (interaction.commandName === 'монетка') {
-                await interaction.reply({ content: funMonetka(), ephemeral: true });
+                await interaction.reply({ content: funcMonetka(), ephemeral: true });
             }
 
             //Команда - бот
             if (interaction.commandName === 'бот') {
-                await interaction.reply({ embeds: [funAboutBot()], ephemeral: true });
+                await interaction.reply({ embeds: [funcAboutBot()], ephemeral: true });
             }
 
             //Команда - гороскоп
@@ -545,16 +550,12 @@ client.on('ready', () => {
         //Обработка выбора выпадающего списка
         if (interaction.isSelectMenu()) {
             if (interaction.customId === 'selectHoro') {
-                let embHoro = await funHoro(interaction.values[0], 0);                
+                let embHoro = await funcHoro(interaction.values[0], 0);                
                 await interaction.update({ content: null, embeds: [embHoro], components: [], ephemeral: true });
             }
         }
     });
-
 });
-
-
-
 
 
 //----------------------------------------
@@ -618,14 +619,14 @@ client.on('messageCreate', message => {
                 //Проверяем на права владельца сервера
                 if (message.author.id === ownerSrvID) {
                     //Если есть права владельца
-                    message.reply({ embeds: [funCommands(0,command,0)]});
+                    message.reply({ embeds: [funcCommands(0,command,0)]});
                 } else {
                     //Если Администратор или Модератор
-                    message.reply({ embeds: [funCommands(1,command,0)]});
+                    message.reply({ embeds: [funcCommands(1,command,0)]});
                 }
             } else {
                 //Обычный пользователь
-                message.reply({ embeds: [funCommands(2,command,0)]});
+                message.reply({ embeds: [funcCommands(2,command,0)]});
             }
         } else {
             //Если личное сообщение
@@ -633,14 +634,14 @@ client.on('messageCreate', message => {
                 //Проверяем на права владельца сервера
                 if (message.author.id === ownerSrvID) {
                     //Если есть права владельца
-                    message.reply({ embeds: [funCommands(0,command,0)]});
+                    message.reply({ embeds: [funcCommands(0,command,0)]});
                 } else {
                     //Если Администратор или Модератор
-                    message.reply({ embeds: [funCommands(1,command,0)]});
+                    message.reply({ embeds: [funcCommands(1,command,0)]});
                 }
             } else {
                 //Обычный пользователь
-                message.reply({ embeds: [funCommands(2,command,0)]});
+                message.reply({ embeds: [funcCommands(2,command,0)]});
             }
         }
     }
@@ -654,7 +655,7 @@ client.on('messageCreate', message => {
         }
         if(numArg === 1) {
             //Отправляем ссылку на группу
-            message.reply({ embeds: [funVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')]});
+            message.reply({ embeds: [funcVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')]});
             return;
         }
         if(numArg > 2) {
@@ -733,7 +734,7 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nВыдаёт случайный результат подброса монетки.\n\nВарианты:\nОрёл, решка или упала на ребро.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/zaQC0LS.gif')]});
             return;
         }
-        message.reply({ content: funMonetka(), allowedMentions: { repliedUser: false }});
+        message.reply({ content: funcMonetka(), allowedMentions: { repliedUser: false }});
     }
 
     /* Подбросить монетку */
@@ -745,7 +746,7 @@ client.on('messageCreate', message => {
         }
         if(numArg === 1) {
             //Отправляем информацию о боте
-            message.reply({ embeds: [funAboutBot()]});
+            message.reply({ embeds: [funcAboutBot()]});
         }
         if(numArg > 2) {
             //Выдаём справку по данной команде
