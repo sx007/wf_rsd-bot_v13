@@ -19,7 +19,7 @@
   "author": "sx007",
   "license": "CC BY",
   "dependencies": {
-    "discord.js": "^13.5.0",
+    "discord.js": "^13.5.1",
     "request": "2.88.2",
     "npm": "^8.3.0"
   }
