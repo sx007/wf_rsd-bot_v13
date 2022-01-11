@@ -459,39 +459,35 @@ client.on('ready', () => {
     //Получаем id владельца сервера
     const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
 
+    //----------------------------------------
+    //Удаляем все ранее зарегистрированные slash-команды
+    //----------------------------------------
+    /*
     client.api.applications(client.user.id).commands.get().then((result) => {
         var a = result;
         var index, len;
+        for (index = 0, len = a.length; index < len; ++index) {
+            client.api.applications(client.user.id).commands(a[index]['id']).delete();
+        }
+        //Смотрим сколько команд зарегистрировано
         if (a.length > 0) {
             console.log("0 < commands");
             for (index = 0, len = a.length; index < len; ++index) {
+                //Выодит название и ID команды
                 console.log(a[index]['name'], a[index]['id']);
             }
         } else {
             console.log("0 commands");
         }
     });
-
-    //----------------------------------------
-    //Удаляем все ранее зарегистрированные slash-команды
-    //----------------------------------------
-    client.api.applications(client.user.id).commands.get().then((result) => {
-        var a = result;
-        var index, len;
-        for (index = 0, len = a.length; index < len; ++index) {
-            //client.deleteCommand(a[index]['id']);
-            client.api.applications(client.user.id).commands(a[index]['id']).delete();
-        }
-    });
-    //restart bot
-    client.application.commands.set([]);
-    client.guilds.cache.get(idSrv).commands.set([]);
-
+    */
+    //Сброс команд
+    //client.application.commands.set([]);
+    //client.guilds.cache.get(idSrv).commands.set([]);
 
     //----------------------------------------
     //Регистрация slash-команд
     //----------------------------------------
-    /*
     client.api.applications(client.user.id).commands.post({
         data: {
         name: 'команды',
@@ -522,8 +518,7 @@ client.on('ready', () => {
         description: 'Позволяет получить гороскоп на сегодня по указанному знаку зодиака'
         },
     });
-    console.log("Регистрация команд завершена");
-    */
+    
     //----------------------------------------
     //Обработка slash-команд
     //----------------------------------------
