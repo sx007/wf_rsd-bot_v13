@@ -193,63 +193,6 @@ function IsJsonString(str) {
     return false;
 }
 
-//парсинг данных с API
-function parseApi(info) {
-    //Класс в игре
-    function classGame(cl) {
-        //Проверяем
-        if (cl === false) {
-            return "-";
-        } else {
-            if (cl === "Rifleman")
-            {
-                return "Штурмовик";
-            }
-            if (cl === "Engineer")
-            {
-                return "Инженер";
-            }
-            if (cl === "Medic")
-            {
-                return "Медик";
-            }
-            if (cl === "Recon")
-            {
-                return "Снайпер";
-            }
-            if (cl === "Heavy")
-            {
-                return "СЭД";
-            }
-        }
-    }
-    var user = "";
-    //Ник в игре
-    user += "**Ник:**   ``" + info.nickname + "``\n";
-    //Клан
-    if (info.clan_name) {
-        user += "**Клан:**   ``" + info.clan_name + "``\n";
-    } else {
-        user += "**Клан:**   ``-``\n";
-    }
-    //Ранг
-    user += "**Ранг:**   ``" + info.rank_id + "``\n";
-    //Общее время матчей
-    user += "**Общее время матчей:**   ``" + info.playtime_h + "ч " + info.playtime_m + "м``\n";
-    //Любимый класс PvP
-    user += "**Любимый класс PvP:**   ``" + classGame(info.favoritPVP) + "``\n";
-    //Соотн. убийств/смертей:
-    user += "**Соотн. убийств/смертей:**   ``" + info.pvp + "``\n";
-    //Побед/Поражений
-    user += "**Побед/Поражений:**   ``" + info.pvp_wins + " / " + info.pvp_lost + "``\n";
-    //Любимый класс PvE
-    user += "**Любимый класс PvE:**   ``" + classGame(info.favoritPVE) + "``\n";
-    //Пройдено PvE
-    user += "**Пройдено PvE:**   ``" + info.pve_wins + "``";
-    //Выводим
-    return user;
-}
-
 //----------------------------------------
 //Список команд
 function funcCommands(authorRole, command, typeMsg){
@@ -972,6 +915,62 @@ client.on('messageCreate', message => {
             return;
         }
         
+        //парсинг данных с API
+        function parseApiUser(info) {
+            //Класс в игре
+            function classGame(cl) {
+                //Проверяем
+                if (cl === false) {
+                    return "-";
+                } else {
+                    if (cl === "Rifleman")
+                    {
+                        return "Штурмовик";
+                    }
+                    if (cl === "Engineer")
+                    {
+                        return "Инженер";
+                    }
+                    if (cl === "Medic")
+                    {
+                        return "Медик";
+                    }
+                    if (cl === "Recon")
+                    {
+                        return "Снайпер";
+                    }
+                    if (cl === "Heavy")
+                    {
+                        return "СЭД";
+                    }
+                }
+            }
+            var user = "";
+            //Ник в игре
+            user += "**Ник:**   ``" + info.nickname + "``\n";
+            //Клан
+            if (info.clan_name) {
+                user += "**Клан:**   ``" + info.clan_name + "``\n";
+            } else {
+                user += "**Клан:**   ``-``\n";
+            }
+            //Ранг
+            user += "**Ранг:**   ``" + info.rank_id + "``\n";
+            //Общее время матчей
+            user += "**Общее время матчей:**   ``" + info.playtime_h + "ч " + info.playtime_m + "м``\n";
+            //Любимый класс PvP
+            user += "**Любимый класс PvP:**   ``" + classGame(info.favoritPVP) + "``\n";
+            //Соотн. убийств/смертей:
+            user += "**Соотн. убийств/смертей:**   ``" + info.pvp + "``\n";
+            //Побед/Поражений
+            user += "**Побед/Поражений:**   ``" + info.pvp_wins + " / " + info.pvp_lost + "``\n";
+            //Любимый класс PvE
+            user += "**Любимый класс PvE:**   ``" + classGame(info.favoritPVE) + "``\n";
+            //Пройдено PvE
+            user += "**Пройдено PvE:**   ``" + info.pve_wins + "``";
+            //Выводим
+            return user;
+        }
 
         //Если указали только название команды
         if(numArg === 1 || numArg > 2) {
@@ -1004,7 +1003,7 @@ client.on('messageCreate', message => {
                         //Если статус запроса 200
                         if (res.statusCode == 200) {
                             if (IsJsonString(data) == true) {
-                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApi(data))]});
+                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApiUser(data))]});
                             }
                         } else {
                             //Неверный запрос
@@ -1043,7 +1042,7 @@ client.on('messageCreate', message => {
             return;
         }
         //парсинг данных с API
-        function parseApi(info) {
+        function parseApiClan(info) {
             var clInfo = "";
             var data = info[0];
             //Название клана
@@ -1123,7 +1122,7 @@ client.on('messageCreate', message => {
                                         var clan = body.filter(function(c){
                                             return (c.clan === clNm);
                                         });
-                                        message.reply({ embeds: [EmbMsg(':crossed_swords: Ежемесячный рейтинг клана', 0xFFF100 , parseApi(clan))]});
+                                        message.reply({ embeds: [EmbMsg(':crossed_swords: Ежемесячный рейтинг клана', 0xFFF100 , parseApiClan(clan))]});
                                         return;
                                     } else {
                                         //Ошибка - не JSON
@@ -1204,7 +1203,7 @@ client.on('messageCreate', message => {
                                     var clan = body.filter(function(c){
                                         return (c.clan.toLowerCase() === cName);
                                     });
-                                    message.reply({ embeds: [EmbMsg(':crossed_swords: Ежемесячный рейтинг клана', 0xFFF100 , parseApi(clan))]});
+                                    message.reply({ embeds: [EmbMsg(':crossed_swords: Ежемесячный рейтинг клана', 0xFFF100 , parseApiClan(clan))]});
                                     return;
                                 } else {
                                     //Ошибка - не JSON
