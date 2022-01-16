@@ -1,6 +1,6 @@
 {
   "name": "wf_rsd-bot-v13",
-  "version": "13.2022.01.09",
+  "version": "13.2022.01.16",
   "description": "Bot for clan Discord",
   "main": "bot.js",
   "scripts": {
@@ -19,8 +19,8 @@
   "author": "sx007",
   "license": "CC BY",
   "dependencies": {
-    "discord.js": "^13.5.1",
+    "discord.js": "^13.6.0",
     "request": "2.88.2",
-    "npm": "^8.3.0"
+    "npm": "^8.3.1"
   }
 }
