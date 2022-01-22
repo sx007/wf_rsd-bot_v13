@@ -195,21 +195,15 @@ function IsJsonString(str) {
 
 //----------------------------------------
 //Список команд
-function funcCommands(authorRole, command, typeMsg){
+function funcCommands(authorRole, command){
     //authorRole = 0-Владелец сервера, 1-Админы и модераторы (из idAdmMod), 2-Прочие пользователи
     //command = название команды из чата
-    //typeMsg = 0-Текстовый чат, 1-slash команда
-    const prefixSlash = "\/";
+
     //Команды владельца сервера
     if (authorRole == 0) {
         //Текстовый чат
         if (typeMsg == 0) {
             return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}rs\`** перезагрузить бота\n**\`${prefix}ping\`** узнать время генерации сообщения\n**\`${prefix}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
-        }
-        //slash команда
-        if (typeMsg == 1) {
-            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}rs\`** перезагрузить бота\n**\`${prefixSlash}ping\`** узнать время генерации сообщения\n**\`${prefixSlash}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды владельца\nБудут добавлены позже...`);
         }
     }
     //Команды админов и модераторов (из idAdmMod)
@@ -219,22 +213,12 @@ function funcCommands(authorRole, command, typeMsg){
             return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
             
         }
-        //slash команда
-        if (typeMsg == 1) {
-            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefixSlash}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefixSlash}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды админа и модератора\nБудут добавлены позже...`);
-        }
     }
     //Команды прочие пользователи
     if (authorRole == 2) {
         //Текстовый чат
         if (typeMsg == 0) {
             return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
-        }
-        //slash команда
-        if (typeMsg == 1) {
-            //return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefixSlash}команды\`** отобразить список всех доступных команд\n**\`${prefixSlash}боец\`** получить игровую статистику о бойце\n**\`${prefixSlash}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefixSlash}бот\`** получить информацию о данном боте\n**\`${prefixSlash}вк\`** получить ссылку на группу клана в VK\n**\`${prefixSlash}монетка\`** случайный результат подброса монетки\n**\`${prefixSlash}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefixSlash}${command} ?\`\`\``);
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\nslash-команды пользователя\nБудут добавлены позже...`);
         }
     }
 }
@@ -388,9 +372,9 @@ async function funcHoro(znakZ){
 async function funcGameApiUser(UserGameName){
     return new Promise(function(resolve) {
         //Формируем ссылку-запрос на API сервер игры
-        let link = "http://api.warface.ru/user/stat/?name=" + UserGameName;
+        let link = "https://api.warface.ru/user/stat/?name=" + UserGameName;
         let urlEnc = encodeURI(link);
-        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 15000};
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
         //Запрос
         request(options, function(err, res, data){
             //Если ошибка
@@ -399,7 +383,7 @@ async function funcGameApiUser(UserGameName){
             }
             //Если нет ответа запроса
             if(!res) {
-                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 15 секунд.\nПопробуйте отправить команду позже.`));
+                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 20 секунд.\nПопробуйте отправить команду позже.`));
             } else {
                 //Если статус запроса 200
                 if (res.statusCode == 200) {
@@ -519,6 +503,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     }
     //Время в бою
     embed.addField('Время в бою', info.playtime_h.toString() + "ч " + info.playtime_m.toString() + "м", true);
+
     //------------------------------------------------------------------
     embed.addField('\u200b', '\u200b');
     //PvP - Любимый класс
@@ -533,7 +518,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     } else {
         embed.addField('У/С', info.pvp.toString(), true);
     }
-
     //PvP - Убийства в голову
     var enHeadP = 0, meHeadP = 0, reHeadP = 0, riHeadP = 0, heHeadP = 0;
     if (arrFull.get('[class]Engineer[mode]PVP[stat]player_headshots')) {
@@ -552,7 +536,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         heHeadP = parseInt(arrFull.get('[class]Heavy[mode]PVP[stat]player_headshots'));
     }
     embed.addField('Убийства в голову', 'Штурмовик: ' + riHeadP.toString() + '\nМедик: ' + meHeadP.toString() + '\nИнженер: ' + enHeadP.toString() + '\nСнайпер: ' + reHeadP.toString() + '\nСЭД: ' + heHeadP.toString(), true);
-
     //PvP - Устранения
     var allKillP = 0, allDeathsP = 0, allFriendlyP = 0, allMeleeP = 0;
     if (arrFull.get('[mode]PVP[stat]player_kills_player')) {
@@ -568,7 +551,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         allMeleeP = parseInt(arrFull.get('[mode]PVP[stat]player_kills_melee'));
     }
     embed.addField('Устранения', 'Убито всего: ' + allKillP.toString() + '\nСмертей: ' + allDeathsP.toString() + '\nСоюзников/себя убито: ' + allFriendlyP.toString() + '\nЗарезано: ' + allMeleeP.toString(), true);
-
     //PvP - Сыграно игр
     //Подсчёт всего игр, побед, поражений, ничья
     var w1P = 0, w2P = 0, l1P = 0, l2P = 0, d1P = 0, d2P = 0, allWP = 0, allLP = 0, allDP = 0, ttlP = 0;
@@ -595,7 +577,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     allDP = d1P + d2P;
     ttlP = allWP + allLP + allDP;
     embed.addField('Сыграно игр', 'Всего: ' + ttlP.toString() + '\nПобед: ' + allWP.toString() + '\nПоражений: ' + allLP.toString()+ '\nВничью: ' + allDP.toString(), true);
-
     //PvP - Прочее
     var allKickP = 0, allLeftP = 0;
     if (arrFull.get('[mode]PVP[stat]player_sessions_kicked')) {
@@ -605,6 +586,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         allLeftP = parseInt(arrFull.get('[mode]PVP[stat]player_sessions_left'));
     }
     embed.addField('Прочее', 'Покинуто матчей: ' + allKickP.toString() + '\nИсключен из матча: ' + allLeftP.toString(), true);
+
     //------------------------------------------------------------------
     embed.addField('\u200b', '\u200b');
     //PvE - Любимый класс
@@ -663,9 +645,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         }
     }
     totalPvE = wonMisPvE + lossMisPvE + wonSpecPvE + lossSpecPvE;
-
-    embed.addField('Пройдено', 'Всего: ' + totalPvE.toString() + '\nУспешно миссий: ' + wonMisPvE.toString() + '\nНеудачных миссий: ' + lossMisPvE.toString() + '\nУспешно спецопераций: ' + wonSpecPvE.toString() + '\nНеудачных спецопераций: ' + lossSpecPvE.toString(), true);
-
+    embed.addField('Пройдено', 'Всего: ' + totalPvE.toString() + '\nPvE миссий: ' + wonMisPvE.toString() + ' / ' + lossMisPvE.toString() + '\nCпецопераци: ' + wonSpecPvE.toString() + ' / ' + lossSpecPvE.toString(), true);
     //PvE - Убийства в голову
     var enHeadE = 0, meHeadE = 0, reHeadE = 0, riHeadE = 0, heHeadE = 0;
     if (arrFull.get('[class]Engineer[mode]PVE[stat]player_headshots')) {
@@ -684,7 +664,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         heHeadE = parseInt(arrFull.get('[class]Heavy[mode]PVE[stat]player_headshots'));
     }
     embed.addField('Убийства в голову', 'Штурмовик: ' + riHeadE.toString() + '\nМедик: ' + meHeadE.toString() + '\nИнженер: ' + enHeadE.toString() + '\nСнайпер: ' + reHeadE.toString() + '\nСЭД: ' + heHeadE.toString(), true);
-
     //PvE - Устранения
     var allKillE = 0, allDeathsE = 0, allFriendlyE = 0, allMeleeE = 0;
     if (arrFull.get('[mode]PVE[stat]player_kills_ai')) {
@@ -700,7 +679,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         allMeleeE = parseInt(arrFull.get('[mode]PVE[stat]player_kills_melee'));
     }
     embed.addField('Устранения', 'Убито всего: ' + allKillE.toString() + '\nСмертей: ' + allDeathsE.toString() + '\nСоюзников/себя убито: ' + allFriendlyE.toString() + '\nЗарезано: ' + allMeleeE.toString(), true);
-
     //PvE - Прочее
     var allKickE = 0, allLeftE = 0, allCoinE = 0;
     if (arrFull.get('[mode]PVE[stat]player_sessions_kicked')) {
@@ -713,6 +691,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         allCoinE = parseInt(arrFull.get('[stat]player_resurrected_by_coin'));
     }
     embed.addField('Прочее', 'Покинуто матчей: ' + allKickE.toString() + '\nИсключен из матча: ' + allLeftE.toString() + '\nИспользовано знаков: ' + allCoinE.toString(), true);
+
     //------------------------------------------------------------------
     embed.addField('\u200b', '\u200b');
     //Общее
@@ -906,12 +885,6 @@ client.on('ready', () => {
     //----------------------------------------
     client.api.applications(client.user.id).commands.post({
         data: {
-        name: 'команды',
-        description: 'Отобразить список всех доступных команд бота'
-        },
-    });
-    client.api.applications(client.user.id).commands.post({
-        data: {
         name: 'вк',
         description: 'Получить ссылку на группу клана в VK'
         },
@@ -941,23 +914,6 @@ client.on('ready', () => {
     client.on('interactionCreate', async interaction => {
         //Обратотка команды
         if (interaction.isCommand()) {
-            //Команда - команды
-            if (interaction.commandName === 'команды') {
-                if (hasRoleId(interaction.user)) {
-                    //Проверяем на права владельца сервера
-                    if (interaction.user.id === ownerAdmID) {
-                        //Если есть права владельца
-                        await interaction.reply({ embeds: [funcCommands(0,'команды',1)], ephemeral: true });
-                    } else {
-                        //Если Администратор или Модератор
-                        await interaction.reply({ embeds: [funcCommands(1,'команды',1)], ephemeral: true });
-                    }
-                } else {
-                    //Обычный пользователь
-                    await interaction.reply({ embeds: [funcCommands(2,'команды',1)], ephemeral: true });
-                }
-            }
-
             //Команда - вк
             if (interaction.commandName === 'вк') {
                 await interaction.reply({ embeds: [funcVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')], ephemeral: true });
@@ -1051,14 +1007,14 @@ client.on('messageCreate', message => {
                 //Проверяем на права владельца сервера
                 if (message.author.id === ownerSrvID) {
                     //Если есть права владельца
-                    message.reply({ embeds: [funcCommands(0,command,0)]});
+                    message.reply({ embeds: [funcCommands(0,command)]});
                 } else {
                     //Если Администратор или Модератор
-                    message.reply({ embeds: [funcCommands(1,command,0)]});
+                    message.reply({ embeds: [funcCommands(1,command)]});
                 }
             } else {
                 //Обычный пользователь
-                message.reply({ embeds: [funcCommands(2,command,0)]});
+                message.reply({ embeds: [funcCommands(2,command)]});
             }
         } else {
             //Если личное сообщение
@@ -1066,14 +1022,14 @@ client.on('messageCreate', message => {
                 //Проверяем на права владельца сервера
                 if (message.author.id === ownerSrvID) {
                     //Если есть права владельца
-                    message.reply({ embeds: [funcCommands(0,command,0)]});
+                    message.reply({ embeds: [funcCommands(0,command)]});
                 } else {
                     //Если Администратор или Модератор
-                    message.reply({ embeds: [funcCommands(1,command,0)]});
+                    message.reply({ embeds: [funcCommands(1,command)]});
                 }
             } else {
                 //Обычный пользователь
-                message.reply({ embeds: [funcCommands(2,command,0)]});
+                message.reply({ embeds: [funcCommands(2,command)]});
             }
         }
     }
