@@ -387,34 +387,23 @@ async function funcHoro(znakZ){
 //Новый вариант получения данных из API - Боец
 async function funcGameApiUser(UserGameName){
     return new Promise(function(resolve) {
-        //resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла какая-то непредвиденная ошибка.\nПопробуйте отправить команду позже.`));
         //Формируем ссылку-запрос на API сервер игры
         let link = "http://api.warface.ru/user/stat/?name=" + UserGameName;
-        //console.log('Функция funcGameApiUser - ссылка', link);
         let urlEnc = encodeURI(link);
-        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 15000};
         //Запрос
         request(options, function(err, res, data){
             //Если ошибка
             if (err) {
-                //console.log('Error - Get user info from API: ', err);
                 resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`));
-                //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                //return;
             }
             //Если нет ответа запроса
             if(!res) {
-                //console.log('Функция funcGameApiUser - нет ответа 10 сек');
-                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`));
-                //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                //return;
+                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 15 секунд.\nПопробуйте отправить команду позже.`));
             } else {
                 //Если статус запроса 200
                 if (res.statusCode == 200) {
                     if (IsJsonString(data) == true) {
-                        //console.log('Функция funcGameApiUser - JSON');
-                        //resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`));
-                        //message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApiUser(data))]});
                         resolve(parseApiUserNew(data,':bar_chart: Статистика по бойцу', 0x02A5D0));
                     }
                 } else {
@@ -423,26 +412,20 @@ async function funcGameApiUser(UserGameName){
                         //console.log('Функция funcGameApiUser - 400');
                         if (data.message == "Ошибка: invalid response status"){
                             resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Недействительный статус ответа сервера`));
-                            //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Недействительный статус ответа сервера`)]});
                         }
                         if (data.message == "Пользователь не найден"){
                             resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На сервере такой __боец не найден__`));
-                            //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На сервере такой __боец не найден__`)]});
                         }
                         if (data.message == "Игрок скрыл свою статистику"){
                             resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __статистика скрыта__`));
-                            //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __статистика скрыта__`)]});
                         }
                         if (data.message == "Персонаж неактивен"){
                             resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __персонаж неактивен__`));
-                            //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __персонаж неактивен__`)]});
                         }
                     }
                     //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
                     if (res.statusCode == 403 || res.statusCode == 404 || res.statusCode == 500) {
-                        //console.log('Функция funcGameApiUser - 403-404-500');
                         resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`));
-                        //message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
                     }
                 }
             }
@@ -636,6 +619,52 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     } else {
         embed.addField('У/С', info.pve.toString(), true);
     }
+    //PvE - Пройдено
+    //Перебераем каждый элемент
+    var totalPvE = 0, wonMisPvE = 0, lossMisPvE = 0, wonSpecPvE = 0, lossSpecPvE = 0;
+    for (const [key, value] of arrFull.entries()) {
+        //Если PvE
+        let PvEWL = key.match(/PVE\[stat\]player_sessions_(won|lost)$/g);
+        //Тренировка
+        let Tren = key.match(/\[difficulty\]trainingmission/g);
+        //Лёгкая
+        let leg = key.match(/\[difficulty\](easy|easymission)/g);
+        //Сложкая
+        let sloj = key.match(/\[difficulty\](normal|normalmission)/g);
+        //Профи
+        let prof = key.match(/\[difficulty\](hard|hardmission)/g);
+        //Успешно
+        let gWon = key.match(/player_sessions_won/g);
+        //Провал
+        let gLost = key.match(/player_sessions_lost/g);
+
+        if (PvEWL) {
+            if (Tren || leg || sloj || prof) {
+                //Если простая миссия PvE
+                if (gWon) {
+                    //Если успешно
+                    wonMisPvE = wonMisPvE + parseInt(value);
+                }
+                if (gLost) {
+                    //Если успешно
+                    lossMisPvE = lossMisPvE + parseInt(value)
+                }
+            } else {
+                //Спецоперация
+                if (gWon) {
+                    //Если успешно
+                    wonSpecPvE = wonSpecPvE + parseInt(value);
+                }
+                if (gLost) {
+                    //Если успешно
+                    lossSpecPvE = lossSpecPvE + parseInt(value);
+                }
+            }
+        }
+    }
+    totalPvE = wonMisPvE + lossMisPvE + wonSpecPvE + lossSpecPvE;
+
+    embed.addField('Пройдено', 'Всего: ' + totalPvE.toString() + '\nУспешно миссий: ' + wonMisPvE.toString() + '\nНеудачных миссий: ' + lossMisPvE.toString() + '\nУспешно спецопераций: ' + wonSpecPvE.toString() + '\nНеудачных спецопераций: ' + lossSpecPvE.toString(), true);
 
     //PvE - Убийства в голову
     var enHeadE = 0, meHeadE = 0, reHeadE = 0, riHeadE = 0, heHeadE = 0;
@@ -715,7 +744,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     embed.addField('Общее', 'Нанесено урона: ' + allDamageO.toString() + '\nПоддержка: ' + allAssistsO.toString() + '\nСовместные действия: ' + allCoopsO.toString() + '\nПополнен боезапас: ' + allAmmoO.toString() + '\nВосстановлено брони: ' + allRepairO.toString() + '\nВосстановлено здоровья: ' + allHealO.toString() + '\nВоскресил: ' + allResurrectO.toString() + '\nВоскрешен: ' + allResurrectedO.toString(), true);
     return embed;
 }
-
 
 
 //Новый вариант получения данных из API - Клан
