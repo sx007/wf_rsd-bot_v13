@@ -892,7 +892,35 @@ client.on('ready', () => {
         description: 'Позволяет получить гороскоп на сегодня по указанному знаку зодиака'
         },
     });
-    
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'боец',
+        description: 'Получить информацию о бойце',
+        options: [{
+            name: 'ник',
+            description: 'Укажите игровой ник',
+            required: true,
+            type: 3
+            }
+        ]
+        },
+    });
+    client.api.applications(client.user.id).commands.post({
+        data: {
+        name: 'клан',
+        description: 'Получить информацию о клане в ежемесячном рейтинге',
+        options: [{
+            name: 'название',
+            description: 'Укажите название клана',
+            required: false,
+            type: 3
+            }
+        ]
+        },
+    });
+
+
+
     //----------------------------------------
     //Обработка slash-команд
     //----------------------------------------
@@ -917,6 +945,48 @@ client.on('ready', () => {
             //Команда - гороскоп
             if (interaction.commandName === 'гороскоп') {
                 await interaction.reply({ content: 'Из выпадающего списка ниже выбирете знак зодиака', ephemeral: true, components: [listForHoro('selectHoro')] });
+            }
+
+            //Команда - Боец
+            if (interaction.commandName === 'боец') {
+                //Проверяем указанный ник бойца
+                var nick = interaction.options.get("ник").value;
+                if (nick.length >= 4 && nick.length <= 16) {
+                    //В норме
+                    var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
+                    var Valid = inValid.test(nick);
+                    if (Valid) {
+                        await interaction.deferReply();
+                        let embUser = await funcGameApiUser(nick);
+                        await interaction.editReply({ content: null, embeds: [embUser], components: [], ephemeral: true });
+                    } else {
+                        await interaction.reply({ content: 'Указанный ник содержит недопустимые символы', ephemeral: true });
+                    }
+                } else {
+                    //Ошибка
+                    await interaction.reply({ content: 'Указанный ник бойца должен быть **от 4 до 16 символов**', ephemeral: true });
+                }
+            }
+
+            //Команда - Клан
+            if (interaction.commandName === 'клан') {
+                //Проверяем указанный ник бойца
+                var clanName = interaction.options.get("название");
+                if (clanName != null) {
+                    var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
+                    var Valid = inValid.test(clanName.value);
+                    if (Valid) {
+                        await interaction.deferReply();
+                        let embClan = await funcGameApiClan(clanName.value);
+                        await interaction.editReply({ content: null, embeds: [embClan], components: [], ephemeral: true });
+                    } else {
+                        await interaction.reply({ content: 'Название клана содержит недопустимые символы', ephemeral: true });
+                    }
+                } else {
+                    await interaction.deferReply();
+                    let embClan = await funcGameApiClan(clNm);
+                    await interaction.editReply({ content: null, embeds: [embClan], components: [], ephemeral: true });
+                }
             }
         }
 
