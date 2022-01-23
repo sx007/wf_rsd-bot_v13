@@ -722,63 +722,6 @@ async function funcGameApiClan(ClanGameName){
     });
 }
 
-
-//Парсинг данных с API - Боец
-function parseApiUser(info) {
-    //Класс в игре
-    function classGame(cl) {
-        if (cl === false) {
-            return "-";
-        } else {
-            if (cl === "Rifleman")
-            {
-                return "Штурмовик";
-            }
-            if (cl === "Engineer")
-            {
-                return "Инженер";
-            }
-            if (cl === "Medic")
-            {
-                return "Медик";
-            }
-            if (cl === "Recon")
-            {
-                return "Снайпер";
-            }
-            if (cl === "Heavy")
-            {
-                return "СЭД";
-            }
-        }
-    }
-    var user = "";
-    //Ник в игре
-    user += "**Ник:**   ``" + info.nickname + "``\n";
-    //Клан
-    if (info.clan_name) {
-        user += "**Клан:**   ``" + info.clan_name + "``\n";
-    } else {
-        user += "**Клан:**   ``-``\n";
-    }
-    //Ранг
-    user += "**Ранг:**   ``" + info.rank_id + "``\n";
-    //Общее время матчей
-    user += "**Общее время матчей:**   ``" + info.playtime_h + "ч " + info.playtime_m + "м``\n";
-    //Любимый класс PvP
-    user += "**Любимый класс PvP:**   ``" + classGame(info.favoritPVP) + "``\n";
-    //Соотн. убийств/смертей:
-    user += "**Соотн. убийств/смертей:**   ``" + info.pvp + "``\n";
-    //Побед/Поражений
-    user += "**Побед/Поражений:**   ``" + info.pvp_wins + " / " + info.pvp_lost + "``\n";
-    //Любимый класс PvE
-    user += "**Любимый класс PvE:**   ``" + classGame(info.favoritPVE) + "``\n";
-    //Пройдено PvE
-    user += "**Пройдено PvE:**   ``" + info.pve_wins + "``";
-    //Выводим
-    return user;
-}
-
 //Парсинг данных с API - Клан
 function parseApiClan(info) {
     var clInfo = "";
@@ -1323,75 +1266,6 @@ client.on('messageCreate', message => {
 
     /* Информация по бойцу */
     else if (command === "боец") {
-        if(numArg === 2 && args[0] === "?") {
-            //Выдаём справку по данной команде
-            message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НикБойца\`\`\``, 'https://i.imgur.com/7gHBgNN.gif')]});
-            return;
-        }
-        //Если указали только название команды
-        if(numArg === 1 || numArg > 2) {
-            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Укажите через пробел ник бойца, которого будите искать.\nТак же можно указать сервер через пробел.\n\nПример: \`${prefix}боец НикБойца Альфа\``)]}).then(m => setTimeout(() => m.delete(), 20000));
-            return;
-        }
-        //Если указали ник
-        if(numArg === 2) {
-            //Ник бойца
-            let uName = args[0].toLowerCase();
-            //Проверяем указанный ник
-            if (uName.length >= 4 && uName.length <= 16) {
-                //Начинаем проверку на указанном сервере
-                let link = "http://api.warface.ru/user/stat/?name=" + uName;
-                let urlEnc = encodeURI(link);
-                var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
-                //Запрос
-                request(options, function(err, res, data){
-                    //Если ошибка
-                    if (err) {
-                        console.log('Error: ', err);
-                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                        return;
-                    }
-                    //Если нет ответа запроса
-                    if(!res) {
-                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                        return;
-                    } else {
-                        //Если статус запроса 200
-                        if (res.statusCode == 200) {
-                            if (IsJsonString(data) == true) {
-                                message.reply({ embeds: [EmbMsg(':bar_chart: Статистика по бойцу', 0x02A5D0 , parseApiUser(data))]});
-                            }
-                        } else {
-                            //Неверный запрос
-                            if (res.statusCode == 400) {
-                                if (data.message == "Ошибка: invalid response status"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Недействительный статус ответа сервера`)]});
-                                }
-                                if (data.message == "Пользователь не найден"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`На сервере такой __боец не найден__`)]});
-                                }
-                                if (data.message == "Игрок скрыл свою статистику"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __статистика скрыта__`)]});
-                                }
-                                if (data.message == "Персонаж неактивен"){
-                                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Боец найден на сервере, но его __персонаж неактивен__`)]});
-                                }
-                            }
-                            //Доступ запрещён || Страница не найдена || Внутренняя ошибка сервера
-                            if (res.statusCode == 403 || res.statusCode == 404 || res.statusCode == 500) {
-                                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-                            }
-                        }
-                    }
-                });
-            } else {
-                message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Указанный ник бойца должен быть **от 4 до 16 символов**`)]}).then(m => setTimeout(() => m.delete(), 20000));
-            }
-        }
-    }
-
-    /* Информация по бойцу */
-    else if (command === "йц") {
         if(numArg === 2 && args[0] === "?") {
             //Выдаём справку по данной команде
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**`, 'https://i.imgur.com/7gHBgNN.gif')]});
