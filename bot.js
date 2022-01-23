@@ -956,7 +956,7 @@ client.on('ready', () => {
                     var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
                     var Valid = inValid.test(nick);
                     if (Valid) {
-                        await interaction.deferReply();
+                        await interaction.deferReply({ content: null, embeds: [], components: [], ephemeral: true });
                         let embUser = await funcGameApiUser(nick);
                         await interaction.editReply({ content: null, embeds: [embUser], components: [], ephemeral: true });
                     } else {
@@ -976,14 +976,14 @@ client.on('ready', () => {
                     var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
                     var Valid = inValid.test(clanName.value);
                     if (Valid) {
-                        await interaction.deferReply();
+                        await interaction.deferReply({ content: null, embeds: [], components: [], ephemeral: true });
                         let embClan = await funcGameApiClan(clanName.value);
                         await interaction.editReply({ content: null, embeds: [embClan], components: [], ephemeral: true });
                     } else {
                         await interaction.reply({ content: 'Название клана содержит недопустимые символы', ephemeral: true });
                     }
                 } else {
-                    await interaction.deferReply();
+                    await interaction.deferReply({ content: null, embeds: [], components: [], ephemeral: true });
                     let embClan = await funcGameApiClan(clNm);
                     await interaction.editReply({ content: null, embeds: [embClan], components: [], ephemeral: true });
                 }
