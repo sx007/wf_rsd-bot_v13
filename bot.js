@@ -8,8 +8,6 @@ const prefix = process.env.PREFIX;
 const idChMsg = process.env.ID_CHANNEL_SEND;
 //ID сервера
 const idSrv = process.env.ID_SERVER;
-//ID роли бота
-const idRoleBot = process.env.ID_ROLE_BOT;
 //Название клана
 const clNm = process.env.CLAN_NAME;
 //ID ролей (Администраторов и Модераторов)
@@ -202,24 +200,17 @@ function funcCommands(authorRole, command){
     //Команды владельца сервера
     if (authorRole == 0) {
         //Текстовый чат
-        if (typeMsg == 0) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}rs\`** перезагрузить бота\n**\`${prefix}ping\`** узнать время генерации сообщения\n**\`${prefix}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
-        }
+        return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}rs\`** перезагрузить бота\n**\`${prefix}ping\`** узнать время генерации сообщения\n**\`${prefix}удалить\`** позволяет удалить N-количество сообщений в текстовом канале\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
     }
     //Команды админов и модераторов (из idAdmMod)
     if (authorRole == 1) {
         //Текстовый чат
-        if (typeMsg == 0) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
-            
-        }
+        return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n**\`${prefix}кик\`** позволяет выгналь пользователя с сервера\n**\`${prefix}бан\`** позволяет забанить пользователя на сервере\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
     }
     //Команды прочие пользователи
     if (authorRole == 2) {
         //Текстовый чат
-        if (typeMsg == 0) {
-            return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
-        }
+        return EmbMsg(':information_source: СПИСОК КОМАНД',0x7ED321,`\n**\`${prefix}команды\`** отобразить список всех доступных команд\n**\`${prefix}боец\`** получить игровую статистику о бойце\n**\`${prefix}клан\`** получить информацию о ежемесячном рейтинге клана\n**\`${prefix}бот\`** получить информацию о данном боте\n**\`${prefix}вк\`** получить ссылку на группу клана в VK\n**\`${prefix}монетка\`** случайный результат подброса монетки\n**\`${prefix}гороскоп\`** Позволяет получить гороскоп на сегодня по указанному знаку зодиака\n\n:warning: Получить подробную справку о любой команде можно добавив через пробел вопросительный знак.\n**Пример набора команды**\n\`\`\`${prefix}${command} ?\`\`\``);
     }
 }
 
@@ -383,7 +374,7 @@ async function funcGameApiUser(UserGameName){
             }
             //Если нет ответа запроса
             if(!res) {
-                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 20 секунд.\nПопробуйте отправить команду позже.`));
+                resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Не получен ответ на запроса в течении 10 секунд.\nПопробуйте отправить команду позже.`));
             } else {
                 //Если статус запроса 200
                 if (res.statusCode == 200) {
@@ -393,7 +384,6 @@ async function funcGameApiUser(UserGameName){
                 } else {
                     //Неверный запрос
                     if (res.statusCode == 400) {
-                        //console.log('Функция funcGameApiUser - 400');
                         if (data.message == "Ошибка: invalid response status"){
                             resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Недействительный статус ответа сервера`));
                         }
@@ -419,7 +409,6 @@ async function funcGameApiUser(UserGameName){
 
 //Парсинг данных с API - Боец
 function parseApiUserNew(info, titleEmb, colorEmb) {
-    //console.log('Функция parseApiUserNew - Начало', info, titleEmb, colorEmb);
     //Класс в игре
     function classGame(clG) {
         if (clG === false) {
@@ -478,7 +467,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         //Разделяем на имя и значение
         var arrTemp = subarr.split('=');
         //Заполняем ассоциативный массив
-        arrFull.set(arrTemp[0],arrTemp[1]);
+        arrFull.set(arrTemp[0], parseInt(arrTemp[1]));
     }
 
     //Формирование
@@ -498,7 +487,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
         embed.addField('Клан', '-', true);
     } 
     //Всего время в игре
-    if (info.clan_name) {
+    if (arrFull.get('[stat]player_online_time')) {
         embed.addField('Время в игре', msToTime(arrFull.get('[stat]player_online_time')).toString(), true);
     }
     //Время в бою
@@ -508,7 +497,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     embed.addField('\u200b', '\u200b');
     //PvP - Любимый класс
     if (info.favoritPVP) {
-        embed.addField('Любимый класс PvP', classGame(info.favoritPVP).toString(), true);
+        embed.addField('Любимый класс PvP', classGame(info.favoritPVP), true);
     } else {
         embed.addField('Любимый класс PvP', '-', true);
     }
@@ -521,56 +510,56 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     //PvP - Убийства в голову
     var enHeadP = 0, meHeadP = 0, reHeadP = 0, riHeadP = 0, heHeadP = 0;
     if (arrFull.get('[class]Engineer[mode]PVP[stat]player_headshots')) {
-        enHeadP = parseInt(arrFull.get('[class]Engineer[mode]PVP[stat]player_headshots'));
+        enHeadP = arrFull.get('[class]Engineer[mode]PVP[stat]player_headshots');
     }
     if (arrFull.get('[class]Medic[mode]PVP[stat]player_headshots')) {
-        meHeadP = parseInt(arrFull.get('[class]Medic[mode]PVP[stat]player_headshots'));
+        meHeadP = arrFull.get('[class]Medic[mode]PVP[stat]player_headshots');
     }
     if (arrFull.get('[class]Recon[mode]PVP[stat]player_headshots')) {
-        reHeadP = parseInt(arrFull.get('[class]Recon[mode]PVP[stat]player_headshots'));
+        reHeadP = arrFull.get('[class]Recon[mode]PVP[stat]player_headshots');
     }
     if (arrFull.get('[class]Rifleman[mode]PVP[stat]player_headshots')) {
-        riHeadP = parseInt(arrFull.get('[class]Rifleman[mode]PVP[stat]player_headshots'));
+        riHeadP = arrFull.get('[class]Rifleman[mode]PVP[stat]player_headshots');
     }
     if (arrFull.get('[class]Heavy[mode]PVP[stat]player_headshots')) {
-        heHeadP = parseInt(arrFull.get('[class]Heavy[mode]PVP[stat]player_headshots'));
+        heHeadP = arrFull.get('[class]Heavy[mode]PVP[stat]player_headshots');
     }
     embed.addField('Убийства в голову', 'Штурмовик: ' + riHeadP.toString() + '\nМедик: ' + meHeadP.toString() + '\nИнженер: ' + enHeadP.toString() + '\nСнайпер: ' + reHeadP.toString() + '\nСЭД: ' + heHeadP.toString(), true);
     //PvP - Устранения
     var allKillP = 0, allDeathsP = 0, allFriendlyP = 0, allMeleeP = 0;
     if (arrFull.get('[mode]PVP[stat]player_kills_player')) {
-        allKillP = parseInt(arrFull.get('[mode]PVP[stat]player_kills_player'));
+        allKillP = arrFull.get('[mode]PVP[stat]player_kills_player');
     }
     if (arrFull.get('[mode]PVP[stat]player_deaths')) {
-        allDeathsP = parseInt(arrFull.get('[mode]PVP[stat]player_deaths'));
+        allDeathsP = arrFull.get('[mode]PVP[stat]player_deaths');
     }
     if (arrFull.get('[mode]PVP[stat]player_kills_player_friendly')) {
-        allFriendlyP = parseInt(arrFull.get('[mode]PVP[stat]player_kills_player_friendly'));
+        allFriendlyP = arrFull.get('[mode]PVP[stat]player_kills_player_friendly');
     }
     if (arrFull.get('[mode]PVP[stat]player_kills_melee')) {
-        allMeleeP = parseInt(arrFull.get('[mode]PVP[stat]player_kills_melee'));
+        allMeleeP = arrFull.get('[mode]PVP[stat]player_kills_melee');
     }
     embed.addField('Устранения', 'Убито всего: ' + allKillP.toString() + '\nСмертей: ' + allDeathsP.toString() + '\nСоюзников/себя убито: ' + allFriendlyP.toString() + '\nЗарезано: ' + allMeleeP.toString(), true);
     //PvP - Сыграно игр
     //Подсчёт всего игр, побед, поражений, ничья
     var w1P = 0, w2P = 0, l1P = 0, l2P = 0, d1P = 0, d2P = 0, allWP = 0, allLP = 0, allDP = 0, ttlP = 0;
     if (arrFull.get('[difficulty][mode]PVP[stat]player_sessions_won')) {
-        w1P = parseInt(arrFull.get('[difficulty][mode]PVP[stat]player_sessions_won'));
+        w1P = arrFull.get('[difficulty][mode]PVP[stat]player_sessions_won');
     }
     if (arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_won')) {
-        w2P = parseInt(arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_won'));
+        w2P = arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_won');
     }
     if (arrFull.get('[difficulty][mode]PVP[stat]player_sessions_lost')) {
-        l1P = parseInt(arrFull.get('[difficulty][mode]PVP[stat]player_sessions_lost'));
+        l1P = arrFull.get('[difficulty][mode]PVP[stat]player_sessions_lost');
     }
     if (arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_lost')) {
-        l2P = parseInt(arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_lost'));
+        l2P = arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_lost');
     }
     if (arrFull.get('[difficulty][mode]PVP[stat]player_sessions_draw')) {
-        d1P = parseInt(arrFull.get('[difficulty][mode]PVP[stat]player_sessions_draw'));
+        d1P = arrFull.get('[difficulty][mode]PVP[stat]player_sessions_draw');
     }
     if (arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_draw')) {
-        d2P = parseInt(arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_draw'));
+        d2P = arrFull.get('[difficulty]normal[mode]PVP[stat]player_sessions_draw');
     }
     allWP = w1P + w2P;
     allLP = l1P + l2P;
@@ -580,10 +569,10 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     //PvP - Прочее
     var allKickP = 0, allLeftP = 0;
     if (arrFull.get('[mode]PVP[stat]player_sessions_kicked')) {
-        allKickP = parseInt(arrFull.get('[mode]PVP[stat]player_sessions_kicked'));
+        allKickP = arrFull.get('[mode]PVP[stat]player_sessions_kicked');
     }
     if (arrFull.get('[mode]PVP[stat]player_sessions_left')) {
-        allLeftP = parseInt(arrFull.get('[mode]PVP[stat]player_sessions_left'));
+        allLeftP = arrFull.get('[mode]PVP[stat]player_sessions_left');
     }
     embed.addField('Прочее', 'Покинуто матчей: ' + allKickP.toString() + '\nИсключен из матча: ' + allLeftP.toString(), true);
 
@@ -591,7 +580,7 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     embed.addField('\u200b', '\u200b');
     //PvE - Любимый класс
     if (info.favoritPVP) {
-        embed.addField('Любимый класс PvE', classGame(info.favoritPVE).toString(), true);
+        embed.addField('Любимый класс PvE', classGame(info.favoritPVE), true);
     } else {
         embed.addField('Любимый класс PvE', '-', true);
     }
@@ -625,21 +614,21 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
                 //Если простая миссия PvE
                 if (gWon) {
                     //Если успешно
-                    wonMisPvE = wonMisPvE + parseInt(value);
+                    wonMisPvE = wonMisPvE + value;
                 }
                 if (gLost) {
                     //Если успешно
-                    lossMisPvE = lossMisPvE + parseInt(value)
+                    lossMisPvE = lossMisPvE + value;
                 }
             } else {
                 //Спецоперация
                 if (gWon) {
                     //Если успешно
-                    wonSpecPvE = wonSpecPvE + parseInt(value);
+                    wonSpecPvE = wonSpecPvE + value;
                 }
                 if (gLost) {
                     //Если успешно
-                    lossSpecPvE = lossSpecPvE + parseInt(value);
+                    lossSpecPvE = lossSpecPvE + value;
                 }
             }
         }
@@ -649,46 +638,46 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     //PvE - Убийства в голову
     var enHeadE = 0, meHeadE = 0, reHeadE = 0, riHeadE = 0, heHeadE = 0;
     if (arrFull.get('[class]Engineer[mode]PVE[stat]player_headshots')) {
-        enHeadE = parseInt(arrFull.get('[class]Engineer[mode]PVE[stat]player_headshots'));
+        enHeadE = arrFull.get('[class]Engineer[mode]PVE[stat]player_headshots');
     }
     if (arrFull.get('[class]Medic[mode]PVE[stat]player_headshots')) {
-        meHeadE = parseInt(arrFull.get('[class]Medic[mode]PVE[stat]player_headshots'));
+        meHeadE = arrFull.get('[class]Medic[mode]PVE[stat]player_headshots');
     }
     if (arrFull.get('[class]Recon[mode]PVE[stat]player_headshots')) {
-        reHeadE = parseInt(arrFull.get('[class]Recon[mode]PVE[stat]player_headshots'));
+        reHeadE = arrFull.get('[class]Recon[mode]PVE[stat]player_headshots');
     }
     if (arrFull.get('[class]Rifleman[mode]PVE[stat]player_headshots')) {
-        riHeadE = parseInt(arrFull.get('[class]Rifleman[mode]PVE[stat]player_headshots'));
+        riHeadE = arrFull.get('[class]Rifleman[mode]PVE[stat]player_headshots');
     }
     if (arrFull.get('[class]Heavy[mode]PVE[stat]player_headshots')) {
-        heHeadE = parseInt(arrFull.get('[class]Heavy[mode]PVE[stat]player_headshots'));
+        heHeadE = arrFull.get('[class]Heavy[mode]PVE[stat]player_headshots');
     }
     embed.addField('Убийства в голову', 'Штурмовик: ' + riHeadE.toString() + '\nМедик: ' + meHeadE.toString() + '\nИнженер: ' + enHeadE.toString() + '\nСнайпер: ' + reHeadE.toString() + '\nСЭД: ' + heHeadE.toString(), true);
     //PvE - Устранения
     var allKillE = 0, allDeathsE = 0, allFriendlyE = 0, allMeleeE = 0;
     if (arrFull.get('[mode]PVE[stat]player_kills_ai')) {
-        allKillE = parseInt(arrFull.get('[mode]PVE[stat]player_kills_ai'));
+        allKillE = arrFull.get('[mode]PVE[stat]player_kills_ai');
     }
     if (arrFull.get('[mode]PVE[stat]player_deaths')) {
-        allDeathsE = parseInt(arrFull.get('[mode]PVE[stat]player_deaths'));
+        allDeathsE = arrFull.get('[mode]PVE[stat]player_deaths');
     }
     if (arrFull.get('[mode]PVE[stat]player_kills_player_friendly')) {
-        allFriendlyE = parseInt(arrFull.get('[mode]PVE[stat]player_kills_player_friendly'));
+        allFriendlyE = arrFull.get('[mode]PVE[stat]player_kills_player_friendly');
     }
     if (arrFull.get('[mode]PVE[stat]player_kills_melee')) {
-        allMeleeE = parseInt(arrFull.get('[mode]PVE[stat]player_kills_melee'));
+        allMeleeE = arrFull.get('[mode]PVE[stat]player_kills_melee');
     }
     embed.addField('Устранения', 'Убито всего: ' + allKillE.toString() + '\nСмертей: ' + allDeathsE.toString() + '\nСоюзников/себя убито: ' + allFriendlyE.toString() + '\nЗарезано: ' + allMeleeE.toString(), true);
     //PvE - Прочее
     var allKickE = 0, allLeftE = 0, allCoinE = 0;
     if (arrFull.get('[mode]PVE[stat]player_sessions_kicked')) {
-        allKickE = parseInt(arrFull.get('[mode]PVE[stat]player_sessions_kicked'));
+        allKickE = arrFull.get('[mode]PVE[stat]player_sessions_kicked');
     }
     if (arrFull.get('[mode]PVE[stat]player_sessions_left')) {
-        allLeftE = parseInt(arrFull.get('[mode]PVE[stat]player_sessions_left'));
+        allLeftE = arrFull.get('[mode]PVE[stat]player_sessions_left');
     }
     if (arrFull.get('[stat]player_resurrected_by_coin')) {
-        allCoinE = parseInt(arrFull.get('[stat]player_resurrected_by_coin'));
+        allCoinE = arrFull.get('[stat]player_resurrected_by_coin');
     }
     embed.addField('Прочее', 'Покинуто матчей: ' + allKickE.toString() + '\nИсключен из матча: ' + allLeftE.toString() + '\nИспользовано знаков: ' + allCoinE.toString(), true);
 
@@ -697,28 +686,28 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     //Общее
     var allDamageO = 0, allAssistsO = 0, allCoopsO = 0, allAmmoO = 0, allRepairO = 0, allHealO = 0, allResurrectO = 0, allResurrectedO = 0;
     if (arrFull.get('[stat]player_damage')) {
-        allDamageO = parseInt(arrFull.get('[stat]player_damage'));
+        allDamageO = arrFull.get('[stat]player_damage');
     }
     if (arrFull.get('[stat]player_climb_assists')) {
-        allAssistsO = parseInt(arrFull.get('[stat]player_climb_assists'));
+        allAssistsO = arrFull.get('[stat]player_climb_assists');
     }
     if (arrFull.get('[stat]player_climb_coops')) {
-        allCoopsO = parseInt(arrFull.get('[stat]player_climb_coops'));
+        allCoopsO = arrFull.get('[stat]player_climb_coops');
     }
     if (arrFull.get('[stat]player_ammo_restored')) {
-        allAmmoO = parseInt(arrFull.get('[stat]player_ammo_restored'));
+        allAmmoO = arrFull.get('[stat]player_ammo_restored');
     }
     if (arrFull.get('[stat]player_repair')) {
-        allRepairO = parseInt(arrFull.get('[stat]player_repair'));
+        allRepairO = arrFull.get('[stat]player_repair');
     }
     if (arrFull.get('[stat]player_heal')) {
-        allHealO = parseInt(arrFull.get('[stat]player_heal'));
+        allHealO = arrFull.get('[stat]player_heal');
     }
     if (arrFull.get('[stat]player_resurrect_made')) {
-        allResurrectO = parseInt(arrFull.get('[stat]player_resurrect_made'));
+        allResurrectO = arrFull.get('[stat]player_resurrect_made');
     }
     if (arrFull.get('[stat]player_resurrected_by_medic')) {
-        allResurrectedO = parseInt(arrFull.get('[stat]player_resurrected_by_medic'));
+        allResurrectedO = arrFull.get('[stat]player_resurrected_by_medic');
     }
     embed.addField('Общее', 'Нанесено урона: ' + allDamageO.toString() + '\nПоддержка: ' + allAssistsO.toString() + '\nСовместные действия: ' + allCoopsO.toString() + '\nПополнен боезапас: ' + allAmmoO.toString() + '\nВосстановлено брони: ' + allRepairO.toString() + '\nВосстановлено здоровья: ' + allHealO.toString() + '\nВоскресил: ' + allResurrectO.toString() + '\nВоскрешен: ' + allResurrectedO.toString(), true);
     return embed;
@@ -999,7 +988,6 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПоказывает краткую информацию доступных для вас команд.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``, 'https://i.imgur.com/h2sueFM.gif')]});
             return;
         }
-        
         //Если сообщение публичное
         if (privateMsg() == false){
             //Если публичное сообщение
@@ -1125,7 +1113,7 @@ client.on('messageCreate', message => {
         message.reply({ content: funcMonetka(), allowedMentions: { repliedUser: false }});
     }
 
-    /* Подбросить монетку */
+    /* О боте */
     else if (command === "бот") {
         if(numArg === 2 && args[0] === "?") {
             //Выдаём справку по данной команде
@@ -1404,35 +1392,26 @@ client.on('messageCreate', message => {
 
     /* Информация по бойцу */
     else if (command === "йц") {
-        //console.log('Команда йц');
         if(numArg === 2 && args[0] === "?") {
-            //console.log('Команда йц - Справка');
             //Выдаём справку по данной команде
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить игровую статистику по бойцу.\n\nУкажите **ник бойца**`, 'https://i.imgur.com/7gHBgNN.gif')]});
-            //return;
         }
         //Если указали только название команды
         if(numArg === 1 || numArg > 2) {
-            //console.log('Команда йц - Не укзан ник');
             message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Укажите через пробел ник бойца, которого будите искать.\nТак же можно указать сервер через пробел.`)]}).then(m => setTimeout(() => m.delete(), 20000));
-            return;
         }
         //Если указали ник
         if(numArg === 2) {
-            //console.log('Команда йц - Указан ник');
             //Ник бойца
             let uName = args[0].toLowerCase();
             //Проверяем указанный ник
             if (uName.length >= 4 && uName.length <= 16) {
-                //console.log('Команда йц - Ник в пордке');
                 //Если ник в норме
                 funcGameApiUser(uName)
-                .then(embHoro => {
-                    //console.log('Команда йц - Функция получения данных: ответ');
-                    message.reply({ embeds: [embHoro]});
+                .then(embUserWF => {
+                    message.reply({ embeds: [embUserWF]});
                 });
             } else {
-                //console.log('Команда йц - Ник не в пордке');
                 message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Указанный ник бойца должен быть **от 4 до 16 символов**`)]}).then(m => setTimeout(() => m.delete(), 20000));
             }
         }
@@ -1445,8 +1424,6 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [EmbMsgHelp(':information_source: СПРАВКА ПО КОМАНДЕ', 0x7ED321, `\nПозволяет получить информацию о клане в ежемесячном рейтинге.\n\nЧтобы получить информацию о нашем клане, достаточно набрать команду\n\`\`\`${prefix}${command}\`\`\`\nЧтобы получить информацю по другому клану, укажите название клана\n\n**Пример набора команды**\n\`\`\`${prefix}${command} НазваниеКлана\`\`\``, 'https://i.imgur.com/rPOFOEd.gif')]});
             return;
         }
-        
-
         //Если указали только название команды
         if(numArg === 1) {
             if (clNm != '') {
@@ -2065,8 +2042,6 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
         }
     }
 });
-
-
 
 //авторизация
 client.login(token);
