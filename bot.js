@@ -1489,7 +1489,7 @@ client.on('messageCreate', message => {
             });
         }
         //Если указали много параметров
-        if(numArg > 1) {
+        if(numArg > 1 && args[0] != "?") {
             message.reply({ content: `Вы неверно указали команду\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``}).then(m => setTimeout(() => m.delete(), 20000));
         }
     }
