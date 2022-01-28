@@ -953,7 +953,7 @@ client.on('ready', () => {
                 var nick = interaction.options.get("ник").value;
                 if (nick.length >= 4 && nick.length <= 16) {
                     //В норме
-                    var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
+                    var inValid = new RegExp('^[\-._А-яёЁ0-9]{4,16}$');
                     var Valid = inValid.test(nick);
                     if (Valid) {
                         await interaction.deferReply({ content: null, embeds: [], components: [], ephemeral: true });
@@ -973,7 +973,7 @@ client.on('ready', () => {
                 //Проверяем указанный ник бойца
                 var clanName = interaction.options.get("название");
                 if (clanName != null) {
-                    var inValid = new RegExp('^[._А-яёЁ0-9]{4,16}$');
+                    var inValid = new RegExp('^[\-._А-яёЁ0-9]{4,16}$');
                     var Valid = inValid.test(clanName.value);
                     if (Valid) {
                         await interaction.deferReply({ content: null, embeds: [], components: [], ephemeral: true });
@@ -1408,10 +1408,16 @@ client.on('messageCreate', message => {
             //Проверяем указанный ник
             if (uName.length >= 4 && uName.length <= 16) {
                 //Если ник в норме
-                funcGameApiUser(uName)
-                .then(embUserWF => {
-                    message.reply({ embeds: [embUserWF]});
-                });
+                var inValid = new RegExp('^[\-._А-яёЁ0-9]{4,16}$');
+                var Valid = inValid.test(uName);
+                if (Valid) {
+                    funcGameApiUser(uName)
+                    .then(embUserWF => {
+                        message.reply({ embeds: [embUserWF]});
+                    });
+                } else {
+                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Указанный ник содержит недопустимые символы`)]}).then(m => setTimeout(() => m.delete(), 20000));
+                }
             } else {
                 message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Указанный ник бойца должен быть **от 4 до 16 символов**`)]}).then(m => setTimeout(() => m.delete(), 20000));
             }
@@ -1433,10 +1439,16 @@ client.on('messageCreate', message => {
                 //Проверяем название сервера
                 if (clNm.length >= 4 && clNm.length <= 16) {
                     //Название клана в порядке
-                    funcGameApiClan(clNm)
-                    .then(embClanWF => {
-                        message.reply({ embeds: [embClanWF]});
-                    });
+                    var inValid = new RegExp('^[\-._А-яёЁ0-9]{4,16}$');
+                    var Valid = inValid.test(clNm);
+                    if (Valid) {
+                        funcGameApiClan(clNm)
+                        .then(embClanWF => {
+                            message.reply({ embeds: [embClanWF]});
+                        });
+                    } else {
+                        message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xFFF100, `Название клана содержит недопустимые символы`)]}).then(m => setTimeout(() => m.delete(), 20000));
+                    }
                 } else {
                     //Название клана не в порядке 4-16
                     message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xFFF100, `Неверно указано название клана в настройках бота.`)]}).then(m => setTimeout(() => m.delete(), 20000));
@@ -1453,11 +1465,16 @@ client.on('messageCreate', message => {
             //Проверяем название сервера
             if (cName.length >= 4 && cName.length <= 16) {
                 //Название клана в порядке
-                //Формируем данные для запроса
-                funcGameApiClan(cName)
-                .then(embClanWF => {
-                    message.reply({ embeds: [embClanWF]});
-                });
+                var inValid = new RegExp('^[\-._А-яёЁ0-9]{4,16}$');
+                var Valid = inValid.test(cName);
+                if (Valid) {
+                    funcGameApiClan(cName)
+                    .then(embClanWF => {
+                        message.reply({ embeds: [embClanWF]});
+                    });
+                } else {
+                    message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xFFF100, `Название клана содержит недопустимые символы`)]}).then(m => setTimeout(() => m.delete(), 20000));
+                }
             } else {
                 //Название клана не в порядке
                 message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0xFFF100, `В указанном названии клана допущена ошибка.\n\nНазвание клана должено быть **от 4 до 16 символов**.`)]}).then(m => setTimeout(() => m.delete(), 20000));
