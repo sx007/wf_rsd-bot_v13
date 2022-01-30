@@ -716,7 +716,6 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     return embed;
 }
 
-
 //Новый вариант получения данных из API - Клан
 async function funcGameApiClan(ClanGameName){
     return new Promise(function(resolve) {
@@ -835,7 +834,7 @@ client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
     client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
-    //console.info(`Запустился бот ${client.user.username} ${ Date.now()}`);
+
     //Получаем id владельца сервера
     const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
 
@@ -918,7 +917,6 @@ client.on('ready', () => {
         ]
         },
     });
-
 
 
     //----------------------------------------
@@ -1104,7 +1102,7 @@ client.on('messageCreate', message => {
             message.reply({ embeds: [funcVk()], components: [MsgLink('https://vk.com/wf_rsd','Наша группа в ВК')]});
             return;
         }
-        if(numArg > 2) {
+        if(numArg > 1 && args[0] != "?") {
             //Выдаём ошибку
             message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0x2B71FF, `\nДопущена ошибка при вводе команды.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``)]});
             return;
@@ -1194,7 +1192,7 @@ client.on('messageCreate', message => {
             //Отправляем информацию о боте
             message.reply({ embeds: [funcAboutBot()]});
         }
-        if(numArg > 2) {
+        if(numArg > 1 && args[0] != "?") {
             //Выдаём справку по данной команде
             message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка', 0x82E9FF, `\nДопущена ошибка при вводе команды.\n\n**Пример набора команды**\n\`\`\`${prefix}${command}\`\`\``)]});
             return;
@@ -1537,7 +1535,6 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     } else {
         srvNick = oldMember.nickname;
     }
-    
 
     //Пользователь подключился к голосовому каналу
     if(!oldState.channel && newState.channel) {
