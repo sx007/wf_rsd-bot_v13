@@ -1399,10 +1399,10 @@ client.on('messageCreate', message => {
         }
         //Если указали только название команды
         if(numArg === 1 || numArg > 2) {
-            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Укажите через пробел ник бойца, которого будите искать.\nТак же можно указать сервер через пробел.`)]}).then(m => setTimeout(() => m.delete(), 20000));
+            message.reply({ embeds: [EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Укажите через пробел ник бойца, которого будите искать.`)]}).then(m => setTimeout(() => m.delete(), 20000));
         }
-        //Если указали ник
-        if(numArg === 2) {
+        //Если указали много параметров
+        if(numArg === 2 && args[0] != "?") {
             //Ник бойца
             let uName = args[0].toLowerCase();
             //Проверяем указанный ник
