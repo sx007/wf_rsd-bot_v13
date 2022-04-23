@@ -15,6 +15,21 @@ const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 //Время старта бота
 const startBot = Date.now();
 
+process.env.UV_THREADPOOL_SIZE = 64;
+
+const customRequest = request.defaults({
+    //forever: true,
+    //timeout: 20000,
+    //encoding: null,
+    //strictSSL: false,
+    //followRedirect: true,
+    //maxRedirects: 10
+    method: "GET",
+    agent : false, 
+    pool : {maxSockets: 500}, 
+    timeout : 20000
+});
+
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_BANS, Intents.FLAGS.GUILD_INTEGRATIONS, Intents.FLAGS.GUILD_INVITES, Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MESSAGE_TYPING, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGE_TYPING, Intents.FLAGS.GUILD_VOICE_STATES],partials: ['USER', 'MESSAGE', 'CHANNEL', 'REACTION'] });
 
@@ -322,9 +337,9 @@ async function funcHoro(znakZ){
         //Получаем сам гороскоп
         let link = "https://horoscopes.rambler.ru/api/front/v1/horoscope/today/" + znakZ;
         let urlEnc = encodeURI(link);
-        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',}};
         //Запрос
-        request(options, function(error, response, body){
+        customRequest(options, function(error, response, body){
             //Если возникла ошибка
             if (error) {
                 console.log('err get horo: ', error);
@@ -338,7 +353,8 @@ async function funcHoro(znakZ){
                             var regex = /(<([^>]+)>)/ig;
                             var bodytext = body.text;
                             var texthoro = bodytext.replace(regex, "");
-                            resolve(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
+                            var dayHoro = body.source;
+                            resolve(EmbMsg(':star: Гороскоп :star:', 0xE98B14, `Гороскоп на сегодня (${dayHoro}) для знака **${nameznak}**\n\n>>> ${texthoro}\n\n`));
                         } else {
                             //Ошибка - не JSON
                             resolve(EmbMsg(':no_entry_sign: Ошибка', 0xE98B14, `Произошла ошибка в данных.\nПопробуйте отправить команду позже.`));
@@ -365,9 +381,9 @@ async function funcGameApiUser(UserGameName){
         //Формируем ссылку-запрос на API сервер игры
         let link = "https://api.warface.ru/user/stat/?name=" + UserGameName;
         let urlEnc = encodeURI(link);
-        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}};
         //Запрос
-        request(options, function(err, res, data){
+        customRequest(options, function(err, res, data){
             //Если ошибка
             if (err) {
                 resolve(EmbMsg(':no_entry_sign: Ошибка',0x02A5D0,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`));
@@ -716,15 +732,16 @@ function parseApiUserNew(info, titleEmb, colorEmb) {
     return embed;
 }
 
+
 //Новый вариант получения данных из API - Клан
 async function funcGameApiClan(ClanGameName){
     return new Promise(function(resolve) {
         //Формируем ссылку-запрос на API сервер игры
         let link = "https://api.warface.ru/rating/monthly?clan=" + ClanGameName;
         let urlEnc = encodeURI(link);
-        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}, timeout: 10000};
+        var options = {url: urlEnc, method: 'GET', json: true, headers: {'User-Agent': 'request', 'Accept-Language' : 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7'}};
         //Запрос
-        request(options, function(err, res, data){
+        customRequest(options, function(err, res, data){
             //Если ошибка
             if (err) {
                 resolve(EmbMsg(':no_entry_sign: Ошибка',0xFFF100,`Сервер с информацией недоступен.\nПопробуйте отправить команду позже.`));
@@ -834,7 +851,7 @@ client.on('ready', () => {
     // Если всё хорошо, то выводим статус ему + в консоль информаию
     client.user.setPresence({ activities: [{ name: 'Warface RU' }], status: 'online' });
     console.log(`Запустился бот ${client.user.username} ${ Date.now()}`);
-
+    //console.info(`Запустился бот ${client.user.username} ${ Date.now()}`);
     //Получаем id владельца сервера
     const ownerAdmID = client.guilds.cache.get(idSrv).ownerId;
 
@@ -917,6 +934,7 @@ client.on('ready', () => {
         ]
         },
     });
+
 
 
     //----------------------------------------
@@ -1535,6 +1553,7 @@ client.on('voiceStateUpdate', (oldState, newState) => {
     } else {
         srvNick = oldMember.nickname;
     }
+    
 
     //Пользователь подключился к голосовому каналу
     if(!oldState.channel && newState.channel) {
