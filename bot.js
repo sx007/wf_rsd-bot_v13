@@ -14,16 +14,10 @@ const clNm = process.env.CLAN_NAME;
 const idAdmMod = process.env.ID_ADM_MOD_ROLE;
 //Время старта бота
 const startBot = Date.now();
-
+//Для устранения проблем с получением request
 process.env.UV_THREADPOOL_SIZE = 64;
-
+//Задаем настройки по умолчанию
 const customRequest = request.defaults({
-    //forever: true,
-    //timeout: 20000,
-    //encoding: null,
-    //strictSSL: false,
-    //followRedirect: true,
-    //maxRedirects: 10
     method: "GET",
     agent : false, 
     pool : {maxSockets: 500}, 
@@ -40,7 +34,6 @@ function EmbMsg(title, color, descr){
     .setTitle(title)
     .setColor(color)
     .setDescription(descr)
-    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -52,7 +45,6 @@ function EmbMsgHelp(title, color, descr, img){
     .setColor(color)
     .setDescription(descr)
     .setImage(img)
-    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -62,7 +54,6 @@ function EmbedMsg(color, Descr){
     let embed = new MessageEmbed()
     .setColor(color)
     .setDescription(Descr)
-    //.setAuthor({ name: 'Бот клана', iconURL: 'https://i.imgur.com/nyTAfzh.png'})
     .setTimestamp()
     return embed;
 }
@@ -253,7 +244,7 @@ function funcMonetka(){
 //О боте
 function funcAboutBot(){
     //id Автора бота
-    const autorID = '307427459450798080';
+    const autorID = atob("MzA3NDI3NDU5NDUwNzk4MDgw");
     const infoSrv = client.guilds.cache;
     //Кол-во пользователей
     const memCount = infoSrv.map(guild => guild.memberCount).join("\n");
@@ -1753,7 +1744,6 @@ client.on('guildMemberUpdate', function(oldMember, newMember) {
             }
         }
     }
-
     //Отправляем сообщение в канал
     var log = newMember.guild.channels.cache.find(ch => ch.id === idChMsg);
     let info = '';
